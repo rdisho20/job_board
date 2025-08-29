@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Job Board</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='stylesheets/styles.css' )}}" /> <!-- link to the stylesheet -->
+</head>
+<body>
+  <!-- Main Wrapper -->
+  <div class="container">
+
+    <!-- Site Header -->
+    <header>
+      <h1>Flask Job Board</h1>
+      <p>Find your next opportunity today!</p>
+    </header>
+
+    <!-- Search Bar -->
+    <div class="search-bar">
+      <input type="text" placeholder="Search jobs, companies, or keywords..." />
+      <button type="submit" name="search_query">Search</button>
+    </div>
+
+    <!-- Navigation -->
+    <nav>
+      <ul>
+        <li><a href="{{ url_for('index') }}" class="active">Latest Jobs</a></li>
+        <li><a href="jobs.html">Browse Jobs</a></li>
+        <li><a href="employers.html">Employers</a></li>
+        <li><a href="signup.html">Sign Up</a></li>
+        <li><a href="login.html">Login</a></li>
+      </ul>
+    </nav>
+    {% block content %}{% endblock %}
+  </div>
+
+  <!-- Site Footer -->
+  <footer>
+    <p>&copy; 2025 Flask Job Board. All rights reserved.</p>
+  </footer>
+</body>
+</html>

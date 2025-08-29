@@ -1,0 +1,178 @@
+/* Base Layout */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f7f7f9; /* light grey, not pure white */
+    color: #2c3e50; /* natural dark blue-grey for text */
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+  }
+  
+  /* Container (general wrapper) */
+  .container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  /* Headings */
+  h1, h2, h3 {
+    color: #2a4d7f; /* strong natural blue */
+    margin-bottom: 10px;
+  }
+  
+  h1 {
+    font-size: 2.2rem;
+    font-weight: bold;
+  }
+  
+  h2 {
+    font-size: 1.8rem;
+  }
+  
+  h3 {
+    font-size: 1.4rem;
+  }
+  
+  /* Links */
+  a {
+    color: #6a5acd; /* purple-ish link color */
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
+  }
+  
+  a:hover {
+    color: #483d8b; /* deeper purple for hover */
+    text-decoration: underline;
+  }
+  
+  /* Buttons */
+  button,
+  .btn {
+    background-color: #4a90e2; /* clean light blue */
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 16px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+  }
+  
+  button:hover,
+  .btn:hover {
+    background-color: #357abd; /* darker blue hover */
+  }
+  
+  /* Search Bar */
+  .search-bar {
+    display: flex;
+    align-items: center;
+    margin: 20px 0;
+  }
+  
+  .search-bar input[type="text"] {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #d1d1d6;
+    border-radius: 6px 0 0 6px;
+    font-size: 1rem;
+  }
+  
+  .search-bar button {
+    border-radius: 0 6px 6px 0;
+  }
+  
+  /* Job Posting Card */
+  .job-card {
+    background-color: #fff;
+    border: 1px solid #e1e4ea;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    transition: box-shadow 0.2s ease-in-out;
+  }
+  
+  .job-card:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  
+  .job-card h3 {
+    margin-top: 0;
+    color: #2a4d7f; /* keep consistent with headings */
+  }
+  
+  .job-card .company {
+    font-weight: bold;
+    color: #4a90e2; /* light blue accent */
+  }
+  
+  .job-card .location {
+    color: #6a5acd; /* purple accent */
+  }
+  
+  /* Bullet Point Lists */
+  ul {
+    padding-left: 20px;
+    margin-bottom: 15px;
+  }
+  
+  ul li {
+    margin-bottom: 8px;
+    list-style-type: disc;
+  }
+  
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 20px 0;
+    margin-top: 40px;
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    border-top: 1px solid #e1e4ea;
+  }
+
+  /* ============================
+   Navigation Bar Styles
+   ============================ */
+nav {
+    background-color: #f7f7f9; /* matches body bg */
+    border-bottom: 1px solid #e1e4ea;
+    padding: 12px 20px;
+  }
+  
+  nav ul {
+    display: flex;
+    justify-content: center; /* center the nav links */
+    align-items: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 24px; /* spacing between links */
+  }
+  
+  nav li {
+    margin: 0;
+  }
+  
+  nav a {
+    color: #2a4d7f; /* natural blue */
+    font-weight: bold;
+    text-decoration: none;
+    font-size: 1rem;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: all 0.2s ease-in-out;
+  }
+  
+  nav a:hover {
+    background-color: #e6ecf5; /* soft highlight */
+    color: #6a5acd; /* purple hover */
+  }
+  
+  /* Active Link State */
+  nav a.active {
+    background-color: #4a90e2; /* light blue highlight */
+    color: #fff;
+  }
