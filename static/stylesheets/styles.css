@@ -176,3 +176,95 @@ nav {
     background-color: #4a90e2; /* light blue highlight */
     color: #fff;
   }
+
+/* ============================
+   Auth Form Styles (used for Sign In + Sign Up)
+   ============================ */
+   .auth-form {
+    max-width: 400px;
+    margin: 60px auto;
+    padding: 0 10px;
+  }
+  
+  .auth-form h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.6rem;
+    color: #2a4d7f; /* consistent blue */
+  }
+  
+  .auth-form label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 0.95rem;
+  }
+  
+  .auth-form input,
+  .auth-form textarea,
+  .auth-form select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    background: #fff;
+  }
+  
+  .auth-form textarea {
+    resize: vertical;
+  }
+  
+  .auth-form button {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    border-radius: 4px;
+    margin-top: 10px;
+  }
+  
+  /* Helper links under form (works for both sign in + sign up) */
+  .auth-form .helper-links {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 0.9rem;
+  }
+  
+  .auth-form .helper-links a {
+    color: #6a5acd; /* purple accent */
+    text-decoration: none;
+  }
+  
+  .auth-form .helper-links a:hover {
+    text-decoration: underline;
+  }
+
+/* ============================
+   Flash Message Styles
+   ============================ */
+.flash {
+  padding: 12px 16px;
+  margin: 15px 0;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Success Flash */
+.flash.success {
+  background-color: #e6f7f1; /* soft greenish background */
+  color: #1d7a50; /* dark teal/green text */
+  border: 1px solid #b2e3c6;
+}
+
+/* Error/Failure Flash */
+.flash.error {
+  background-color: #fdeaea; /* soft red background */
+  color: #a12626; /* deep red text */
+  border: 1px solid #f5b5b5;
+}
+  
+  

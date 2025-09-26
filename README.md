@@ -28,6 +28,7 @@ Employer Login / Employer Sign Up
 Recent Job Postings  
 Category Job Postings (dropdown menu)  
 Search  
+Employers (list)
 
 ## About Main Styles
 - Body → soft grey bg, natural dark-blue text.

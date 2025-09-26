@@ -1,1 +1,8 @@
-admin: $2b$12$ISxxVzh18cbH8hHOFPyQ6eBFjxPlpA27t4SI9ygGE7Ox8ZqbbYFw.
+admin@job_board.com:
+  password: $2b$12$ISxxVzh18cbH8hHOFPyQ6eBFjxPlpA27t4SI9ygGE7Ox8ZqbbYFw.
+  name: Administrator
+  description: 
+test_company@testcompany.com:
+	password: $2b$12$tqLkAd/aiTDIlTLo9CUbR.2OJ59w19GJ/OTw0eGbqxl6O8/JwPaEW
+	name: Test Company
+	description: this is a test description!
