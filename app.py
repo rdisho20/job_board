@@ -1,19 +1,31 @@
+import os
+import secrets
+from functools import wraps    # for creating 'named' decorators
 from flask import (
     flash,
     Flask,
+    g,
     redirect,
     render_template,
     request,
     url_for
 )
+from job_board.utils import (
+    validate_new_password
+)
 import os
 import yaml
+from job_board.database_persistence import DatabasePersistence
 from bcrypt import checkpw, gensalt, hashpw
 
 app = Flask(__name__)
-app.secret_key = 'secret1'
+app.secret_key = secrets.token_hex(32)
 
-def get_data_path():
+@app.before_request
+def load_db():
+    g.storage = DatabasePersistence()
+
+def get_data_path(): # for company profile images
     app_dir = os.path.dirname(__file__)
     
     if app.config['TESTING']:
@@ -21,7 +33,12 @@ def get_data_path():
     else:
         return os.path.join(app_dir, 'job_board', 'data')
 
-def load_user_credentials():
+'''
+TODO:
+- DETERMINE IF CAN USE FUNCTION
+- new implementation; query database for company profiles
+'''
+def load_company_credentials():
     filename = 'users.yml'
     root_dir = os.path.dirname(__file__)
     if app.config['TESTING']:
@@ -31,87 +48,61 @@ def load_user_credentials():
     
     with open(credentials_path, 'r') as file:
         return yaml.safe_load(file)
-
-def validate_password(password):
-    '''
-    Password must be at least 8 characters long
-    Must include at least 1 number
-    Must include upper and lowercase letters
-    Must include at least 1 symbol
-    d- leave as string, checking against valid characters
-    '''
-    numbers = '1234567890'
-    letters = 'abcdefghijklmnopqrstuvwxyz'
-    symbols = '_!@#$%^&*;:,.<>?`~ '
-    number_count = 0
-    symbol_count = 0
-    lower_count = 0
-    upper_count = 0
-
-    if len(password) < 8:
-        return False
-
-    for char in password:
-        if (char not in numbers and
-            char not in letters and
-            char not in letters.upper() and
-            char not in symbols):
-            return False
-        
-        elif char in letters:
-            lower_count += 1
-        
-        elif char in letters.upper():
-            upper_count += 1
-
-        elif char in numbers:
-            number_count += 1
-        
-        elif char in symbols:
-            symbol_count += 1
-    
-    if (number_count > 0 and symbol_count > 0 and
-        lower_count > 0 and upper_count > 0):
-        return True
-    
-    return False
     
 @app.route('/')
 def index():
     return render_template('index.html')
 
+'''
+TODO:
+- create jinja template for this route;
+    TRY TO DO THIS NEXT
+'''
+@app.route('/companies')
+def display_company_profiles():
+    companies = g.storage.all_companies()
+    return render_template('companies.html', companies=companies)
+
 @app.route('/signup')
 def signup():
     return render_template('signup.html')
 
+'''
+TODO: 
+- 'else' requires NEW implementation;
+    database query to insert new company profile
+'''
 @app.route('/signup', methods=['POST'])
-def signup_user():
-    credentials = load_user_credentials()
+def signup_company():
+    company_names = g.storage.all_company_names()
+    company_emails = g.storage.all_company_emails()
     email = request.form['email'].strip()
     password = request.form['password']
-    company_name = request.form['company-name'].strip()
-    company_description = request.form['description'].strip()
+    name = request.form['name'].strip()
+    description = request.form['description'].strip()
 
-    if email in credentials:
-        flash("An account with that email already exists. Please, try again.")
-        return render_template('signup.html',
-                               company_name=company_name,
-                               company_description=company_description), 422
-    elif not email or not password or not company_name:
+    if email in company_emails:
+        flash("An account with that email already exists. "
+              "Please, try again.", "error")
+        return render_template('signup.html', name=name,
+                               description=description), 422
+    elif name in company_names:
+        flash("An account with that company name already exists. "
+              "Please, try again.", "error")
+        return render_template('signup.html', description=description), 422
+    elif not email or not password or not name:
         flash("Please enter required information.", "error")
-        return render_template('signup.html', email=email,
-                               company_name=company_name,
-                               company_description=company_description), 422
+        return render_template('signup.html', email=email, name=name,
+                               description=description), 422
     elif len(email) > 45 or len(password) > 45:
-        flash("Email & Password cannot be longer than 45 characters.", "error")
-        return render_template('signup.html',
-                               company_name=company_name,
-                               company_description=company_description), 422
-    elif not validate_password(password):
+        flash("Email & Password cannot be longer than 45 characters.",
+              "error")
+        return render_template('signup.html', name=name,
+                               description=description), 422
+    elif not validate_new_password(password):
         flash("Please enter a valid password.", "error")
-        return render_template('signup.html', email=email,
-                               company_name=company_name,
-                               company_description=company_description), 422
+        return render_template('signup.html', email=email, name=name,
+                               description=description), 422
 
     else:
         filename = 'users.yml'
@@ -127,8 +118,8 @@ def signup_user():
             file.write('\n')
             file.write(f'{email}:\n')
             file.write(f'\tpassword: {hashed_password_string}\n')
-            file.write(f'\tname: {company_name}\n')
-            file.write(f'\tdescription: {company_description}')        
+            file.write(f'\tname: {name}\n')
+            file.write(f'\tdescription: {description}')        
 
         flash("Account successfully created!", "success")
         return redirect(url_for('signin'))
@@ -136,6 +127,14 @@ def signup_user():
 @app.route('/signin')
 def signin():
     return render_template('signin.html')
+
+@app.route('/companies/<company_id>')
+def show_company_profile(company_id):
+    pass
+
+@app.route('/companies/<company_id>', methods=['POST'])
+def edit_company_profile(company_id):
+    pass
 
 if __name__ == "__main__":
     app.run(debug=True, port=5003)
