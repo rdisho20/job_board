@@ -65,6 +65,28 @@ class DatabasePersistence:
         
         company_emails = [dict(result).pop() for result in results]
         return company_emails
+    
+    '''
+    TODO:
+    query for individual company
+    '''
+    def find_company_by_name(self, name):
+        pass
+    
+    def create_new_compamy(self, name, headquarters,
+                           email, password, description):
+        query = dedent('INSERT INTO companies '
+                       '("name", headquarters, email, '
+                       '"password", "description") '
+                       'VALUES (%s, %s, %s, %s, %s)')
+        logger.info("""Executing query: %s with name: %s,
+                    with headquarters: %s, with email: %s,
+                    with password: %s, with description: %s""",
+                    query, name, headquarters, email, password, description)
+        with self._database_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(query, (name, headquarters, email,
+                                       password, description))
 
     def _setup_schema(self):
         pass

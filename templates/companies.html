@@ -1,51 +1,30 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<section class="companies">
+<section class="company-listings">
     <h2>Company Directory</h2>
-    <div class="company-listing">
-        <div class="company-logo">
-            Company logo here
-        </div>
-        <div class="company-heading">
-            <h3>BlueTech Solutions</h3>
-            <p><strong>Headquarters:</strong> San Francisco, CA</p>
-        </div>
-        <div class="company-description">
-            <p>Company description goes here...</p>
-            <p>
-                <strong>
-                    <a href="#">Click to see all postings by this company</a>
-                </strong>
-            </p>
-        </div>
-    </div>
 
-    <div class="company-listing">
-        <div class="company-logo">
-            Company logo here
-        </div>
-        <div class="company-heading">
-            <h3>PurpleWave Media</h3>
-            <p><strong>Headquarters:</strong> San Francisco, CA</p>
-        </div>
-        <div class="company-description">
-            <p>Company description goes here...</p>
-            <p>
-                <strong>
-                    <a href="#">Click to see all postings by this company</a>
-                </strong>
-            </p>
-        </div>
-    </div>
+    {% for company in companies %}
+        {% if company.id != 1 %}
+            <div class="company-card">
+                <div class="company-logo">
+                    Company logo here
+                </div>
+                <div class="company-heading">
+                    <h3>{{ company.name }}</h3>
+                    <p><strong>Headquarters:</strong> {{ company.headquarters }}</p>
+                </div>
+                <div class="company-description">
+                    <p>{{ company.description }}</p>
+                    <p>
+                        <strong>
+                            <a href="#">Click to see all postings by this company</a>
+                        </strong>
+                    </p>
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
 
 </section>
 {% endblock %}
-
-id serial PRIMARY KEY,
-"name" varchar(100) NOT NULL,
-headquarters varchar(100) NOT NULL,
-email text NOT NULL,
-"password" text NOT NULL,
-"description" varchar(1000),
-company_logo text

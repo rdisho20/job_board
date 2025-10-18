@@ -84,6 +84,7 @@ body {
   }
   
   /* Job Posting Card */
+  .company-card,
   .job-card {
     background-color: #fff;
     border: 1px solid #e1e4ea;
@@ -94,6 +95,7 @@ body {
     transition: box-shadow 0.2s ease-in-out;
   }
   
+  .company-card:hover,
   .job-card:hover {
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   }
@@ -270,14 +272,8 @@ nav {
 /* ============================
    Company Directory Styles
    ============================ */
-.companies h2 {
+.company-listings h2 {
   margin-bottom: 20px;
-}
-
-   .company-listing {
-  padding: 0 0;
-  margin: 50px 0 0;
-  /*outline: 2px solid black;*/
 }
 
 .company-logo {

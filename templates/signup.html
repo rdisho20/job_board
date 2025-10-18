@@ -5,16 +5,19 @@
     <form class="auth-form" action="{{ url_for('signup') }}" method="post">
         <h2>Employer Sign Up</h2>
 
-        <label for="name">Company Name</label>
-        <input type="text" id="name" name="name" placeholder="Enter your company name" value="{{ company_name }}" required />
+        <label for="name">Company Name:</label>
+        <input type="text" id="name" name="name" placeholder="Enter your company name..." value="{{ company_name }}" required>
 
-        <label for="email">Company Email</label>
-        <input type="email" id="email" name="email" placeholder="Enter your email" value="{{ email }}" required />
+        <label for="email">Company Email (You will use this to login):</label>
+        <input type="email" id="email" name="email" placeholder="Enter your email..." value="{{ email }}" required>
 
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" placeholder="Choose a strong password" required />
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" placeholder="Choose a strong password..." required>
 
-        <label for="description">Company Description</label>
+        <label for="location">Tell us your location headquarters:</label>
+        <input type="text" id="name" name="name" placeholder="Enter your company's location..." value="{{ company_name }}" required>
+
+        <label for="description">Tell us about your company:</label>
         <textarea id="description" name="description" rows="4" placeholder="Tell us about your company..." value="{{ company_description }}"></textarea>
 
         <button type="submit" class="btn">Create Account</button>

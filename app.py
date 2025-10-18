@@ -11,7 +11,7 @@ from flask import (
     url_for
 )
 from job_board.utils import (
-    validate_new_password
+    validate_new_password_minimum_requirements
 )
 import os
 import yaml
@@ -48,16 +48,22 @@ def load_company_credentials():
     
     with open(credentials_path, 'r') as file:
         return yaml.safe_load(file)
-    
+
+def valid_credentials(company_name, password):
+    companies = g.storage.all_companies()
+    credentials = [company.name for company in companies]
+
+    if company_name in credentials:
+        company_credentials = g.storage.single_company(company_name)
+        stored_password = company_credentials['password'].encode('utf-8')
+        return checkpw(password.encode('utf-8'), stored_password)
+    else:
+        return False
+
 @app.route('/')
 def index():
     return render_template('index.html')
 
-'''
-TODO:
-- create jinja template for this route;
-    TRY TO DO THIS NEXT
-'''
 @app.route('/companies')
 def display_company_profiles():
     companies = g.storage.all_companies()
@@ -67,18 +73,14 @@ def display_company_profiles():
 def signup():
     return render_template('signup.html')
 
-'''
-TODO: 
-- 'else' requires NEW implementation;
-    database query to insert new company profile
-'''
 @app.route('/signup', methods=['POST'])
 def signup_company():
     company_names = g.storage.all_company_names()
     company_emails = g.storage.all_company_emails()
+    name = request.form['name'].strip()
+    headquarters = request.form['headquarters'].strip()
     email = request.form['email'].strip()
     password = request.form['password']
-    name = request.form['name'].strip()
     description = request.form['description'].strip()
 
     if email in company_emails:
@@ -99,29 +101,18 @@ def signup_company():
               "error")
         return render_template('signup.html', name=name,
                                description=description), 422
-    elif not validate_new_password(password):
+    elif not validate_new_password_minimum_requirements(password):
         flash("Please enter a valid password.", "error")
         return render_template('signup.html', email=email, name=name,
                                description=description), 422
 
     else:
-        filename = 'users.yml'
-        root_dir = os.path.dirname(__file__)
-        if app.config['TESTING']:
-            credentials_path = os.path.join(root_dir, 'tests', filename)
-        else:
-            credentials_path = os.path.join(root_dir, 'job_board', filename)
+        hashed = hashpw(password.encode('utf-8'), gensalt())
+        hashed_password_string = hashed.decode('utf-8')
+        g.storage.add_new_company(name, headquarters, email,
+                                  hashed_password_string, description)
 
-        with open(credentials_path, 'a') as file:
-            hashed = hashpw(password.encode('utf-8'), gensalt())
-            hashed_password_string = hashed.decode('utf-8')
-            file.write('\n')
-            file.write(f'{email}:\n')
-            file.write(f'\tpassword: {hashed_password_string}\n')
-            file.write(f'\tname: {name}\n')
-            file.write(f'\tdescription: {description}')        
-
-        flash("Account successfully created!", "success")
+        flash(f"Account successfully created. Welcome {name}!", "success")
         return redirect(url_for('signin'))
 
 @app.route('/signin')
@@ -134,6 +125,14 @@ def show_company_profile(company_id):
 
 @app.route('/companies/<company_id>', methods=['POST'])
 def edit_company_profile(company_id):
+    pass
+
+@app.route('/companies/<company_id>/jobs')
+def show_company_job_postings(company_id):
+    pass
+
+@app.route('/companies/<company_id>/jobs/<job_id>', methods=['POST'])
+def edit_job(company_id):
     pass
 
 if __name__ == "__main__":

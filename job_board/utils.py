@@ -1,4 +1,4 @@
-def validate_new_password(password):
+def validate_new_password_minimum_requirements(password):
     '''
     Password must be at least 8 characters long
     Must include at least 1 number
@@ -41,4 +41,3 @@ def validate_new_password(password):
         return True
     
     return False
-
