@@ -37,7 +37,7 @@ def validate_new_password(password):
             symbol_count += 1
     
     if (number_count > 0 and symbol_count > 0 and
-        lower_count > 0 and upper_count > 0):
+        lower_count > 0 and upper_count > 0 and len(password) >= 8):
         return True
     
     return False

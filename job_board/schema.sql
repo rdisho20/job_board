@@ -1,6 +1,7 @@
 CREATE TABLE companies (
     id serial PRIMARY KEY,
     "name" varchar(100) NOT NULL,
+    headquarters varchar(100) NOT NULL,
     email text NOT NULL,
     "password" text NOT NULL,
     "description" varchar(1000),

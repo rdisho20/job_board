@@ -266,5 +266,39 @@ nav {
   color: #a12626; /* deep red text */
   border: 1px solid #f5b5b5;
 }
-  
-  
+
+/* ============================
+   Company Directory Styles
+   ============================ */
+.companies h2 {
+  margin-bottom: 20px;
+}
+
+   .company-listing {
+  padding: 0 0;
+  margin: 50px 0 0;
+  /*outline: 2px solid black;*/
+}
+
+.company-logo {
+  box-sizing: border-box;
+  display: inline-block;
+  height: 125px;
+  outline: 1px solid red;
+  vertical-align: top;
+  width: 125px;
+}
+
+.company-heading {
+  display: inline-block;
+  vertical-align: top;
+  margin-left: 20px;
+}
+
+.company-description {
+  margin: 20px 0 0;
+}
+
+.company-description p {
+  margin: 0;
+}

@@ -34,7 +34,7 @@ class DatabasePersistence:
         logger.info("Executing query: %s", query)
         with self._database_connection() as conn:
             with conn.cursor(cursor_factory=DictCursor) as cursor:
-                cursor.execute()
+                cursor.execute(query)
                 results = cursor.fetchall()
         
         companies = [dict(result) for result in results]
@@ -47,7 +47,7 @@ class DatabasePersistence:
         logger.info("Executing query: %s", query)
         with self._database_connection() as conn:
             with conn.cursor(cursor_factory=DictCursor) as cursor:
-                cursor.execute()
+                cursor.execute(query)
                 results = cursor.fetchall()
         
         company_names = [dict(result).pop(0) for result in results]
@@ -60,7 +60,7 @@ class DatabasePersistence:
         logger.info("Executing query: %s", query)
         with self._database_connection() as conn:
             with conn.cursor(cursor_factory=DictCursor) as cursor:
-                cursor.execute()
+                cursor.execute(query)
                 results = cursor.fetchall()
         
         company_emails = [dict(result).pop() for result in results]
