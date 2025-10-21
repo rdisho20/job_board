@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="container">
-    <form class="auth-form" action="{{ url_for('signup') }}" method="post">
+    <form class="auth-form" action="{{ url_for('signup_company') }}" method="post">
         <h2>Employer Sign Up</h2>
 
         <label for="name">Company Name:</label>
@@ -24,7 +24,7 @@
     </form>
 
     <div class="helper-links">
-        <a href="signin.html">Already have an account? Sign In</a>
+        <a href="{{ url_for('signin') }}">Already have an account? Sign In</a>
     </div>
 </div>
 {% endblock %}

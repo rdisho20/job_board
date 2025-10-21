@@ -8,6 +8,7 @@ from flask import (
     redirect,
     render_template,
     request,
+    session,
     url_for
 )
 from job_board.utils import (
@@ -21,10 +22,6 @@ from bcrypt import checkpw, gensalt, hashpw
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(32)
 
-@app.before_request
-def load_db():
-    g.storage = DatabasePersistence()
-
 def get_data_path(): # for company profile images
     app_dir = os.path.dirname(__file__)
     
@@ -33,32 +30,21 @@ def get_data_path(): # for company profile images
     else:
         return os.path.join(app_dir, 'job_board', 'data')
 
-'''
-TODO:
-- DETERMINE IF CAN USE FUNCTION
-- new implementation; query database for company profiles
-'''
-def load_company_credentials():
-    filename = 'users.yml'
-    root_dir = os.path.dirname(__file__)
-    if app.config['TESTING']:
-        credentials_path = os.path.join(root_dir, 'tests', filename)
-    else:
-        credentials_path = os.path.join(root_dir, 'job_board', filename)
-    
-    with open(credentials_path, 'r') as file:
-        return yaml.safe_load(file)
-
-def valid_credentials(company_name, password):
-    companies = g.storage.all_companies()
-    credentials = [company.name for company in companies]
-
-    if company_name in credentials:
-        company_credentials = g.storage.single_company(company_name)
-        stored_password = company_credentials['password'].encode('utf-8')
+def valid_credentials(company_email, password):
+    company = g.storage.find_company_by_email(company_email)
+    if company:
+        stored_password = company['password'].encode('utf-8')
         return checkpw(password.encode('utf-8'), stored_password)
     else:
         return False
+
+@app.context_processor
+def company_signed_in():
+    return dict(company_signed_in=lambda: 'company_email' in session)
+
+@app.before_request
+def load_db():
+    g.storage = DatabasePersistence()
 
 @app.route('/')
 def index():
@@ -112,19 +98,46 @@ def signup_company():
         g.storage.add_new_company(name, headquarters, email,
                                   hashed_password_string, description)
 
-        flash(f"Account successfully created. Welcome {name}!", "success")
+        flash("Account successfully created! "
+              "You may sign in to your account.", "success")
         return redirect(url_for('signin'))
 
 @app.route('/signin')
 def signin():
+    if 'company_email' in session:
+        flash("You are already signed in!", "error")
+        return render_template('signin.html', session=session)
+
     return render_template('signin.html')
+
+@app.route('/signin', methods=['POST'])
+def signin_company():
+    company_email = request.form['email'].strip()
+    password = request.form['password'].strip()
+    if valid_credentials(company_email, password):
+        session['company_email'] = company_email
+        flash("You have successfully signed in!", "success")
+        return redirect(url_for('index'))
+    else:
+        flash("Invalid credentials.  Please try again.", "error")
+        return render_template('signin.html', company_email=company_email), 422
+
+@app.route('/signout')
+def signout():
+    if 'company_email' not in session:
+        flash("You are already signed out!", "error")
+        return redirect(url_for('index'))
+
+    session.pop('company_email')
+    flash("You have successfully signed out.", "success")
+    return redirect(url_for('signin'))
 
 @app.route('/companies/<company_id>')
 def show_company_profile(company_id):
     pass
 
 @app.route('/companies/<company_id>', methods=['POST'])
-def edit_company_profile(company_id):
+def update_company_profile(company_id):
     pass
 
 @app.route('/companies/<company_id>/jobs')
