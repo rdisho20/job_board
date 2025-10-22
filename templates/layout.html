@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Job Board</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='stylesheets/styles.css' )}}" /> <!-- link to the stylesheet -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='stylesheets/styles.css' )}}" />
 </head>
 <body>
   <!-- Main Wrapper -->
@@ -30,7 +30,9 @@
         <li><a href="post_job.html">Post a Job</a></li>
         {% if company_signed_in() %} <!-- using context processor @ app.py to gain access here -->
           <li>
-            <a href="dashboard.html"><em>EDIT Company Profile</em></a>
+            <a href="{{ url_for('view_company_dashboard', company_id=inject_company_id()) }}">
+              <em>EDIT Company Profile</em>
+            </a>
           </li>
           <li>
             <a href="{{ url_for('signout') }}"><em>Sign Out</em></a>

@@ -40,7 +40,11 @@ def valid_credentials(company_email, password):
 
 @app.context_processor
 def company_signed_in():
-    return dict(company_signed_in=lambda: 'company_email' in session)
+    return dict(company_signed_in=lambda: 'company_id' in session)
+
+@app.context_processor
+def inject_company_id():
+    return dict(company_id=session.get('company_id'))
 
 @app.before_request
 def load_db():
@@ -87,7 +91,7 @@ def signup_company():
         return render_template('signup.html', email=email, name=name,
                                description=description), 422
     elif len(email) > 45 or len(password) > 45:
-        flash("Email & Password cannot be longer than 45 characters.",
+        flash("Email and Password cannot be longer than 45 characters.",
               "error")
         return render_template('signup.html', name=name,
                                description=description), 422
@@ -95,7 +99,6 @@ def signup_company():
         flash("Please enter a valid password.", "error")
         return render_template('signup.html', email=email, name=name,
                                description=description), 422
-
     else:
         hashed = hashpw(password.encode('utf-8'), gensalt())
         hashed_password_string = hashed.decode('utf-8')
@@ -108,18 +111,24 @@ def signup_company():
 
 @app.route('/signin')
 def signin():
-    if 'company_email' in session:
+    if 'company_id' in session:
         flash("You are already signed in!", "error")
-        return render_template('signin.html', session=session)
+        return redirect('index')
 
     return render_template('signin.html')
 
+'''
+TODO:
+signed in w/ company and get error about `inject_company_id`
+- need fixing somewhere
+'''
 @app.route('/signin', methods=['POST'])
 def signin_company():
     company_email = request.form['email'].strip()
     password = request.form['password'].strip()
     if valid_credentials(company_email, password):
-        session['company_email'] = company_email
+        company = g.storage.find_company_by_email(company_email)
+        session['company_id'] = company['id']
         flash("You have successfully signed in!", "success")
         return redirect(url_for('index'))
     else:
@@ -128,27 +137,41 @@ def signin_company():
 
 @app.route('/signout')
 def signout():
-    if 'company_email' not in session:
+    if 'company_id' not in session:
         flash("You are already signed out!", "error")
         return redirect(url_for('index'))
 
-    session.pop('company_email')
+    session.pop('company_id')
     flash("You have successfully signed out.", "success")
     return redirect(url_for('signin'))
 
-@app.route('/companies/<company_id>')
-def show_company_profile(company_id):
+@app.route('/companies/<int:company_id>')
+def view_company_profile(company_id):
     pass
 
-@app.route('/companies/<company_id>', methods=['POST'])
+@app.route('/companies/<int:company_id>/dashboard')
+def view_company_dashboard(company_id):
+    company = g.storage.find_company_by_id(company_id)
+    if 'company_id' not in session or not company:
+        flash("You cannot do that!", "error")
+        return redirect('index'), 422
+    
+    name = company['name']
+    location = company['location']
+    description = company['description']
+    logo = company['logo']
+    return render_template('dashboard.html', name=name, location=location,
+                           description=description, logo=logo)
+
+@app.route('/companies/<int:company_id>', methods=['POST'])
 def update_company_profile(company_id):
     pass
 
-@app.route('/companies/<company_id>/jobs')
+@app.route('/companies/<int:company_id>/jobs')
 def show_company_job_postings(company_id):
     pass
 
-@app.route('/companies/<company_id>/jobs/<job_id>', methods=['POST'])
+@app.route('/companies/<int:company_id>/jobs/<int:job_id>', methods=['POST'])
 def edit_job(company_id):
     pass
 

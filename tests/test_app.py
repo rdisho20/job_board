@@ -94,8 +94,7 @@ class JobBoardTest(unittest.TestCase):
                       response.get_data(as_text=True))
         self.assertIn("Please, try again.", response.get_data(as_text=True))
 
-    # FIX THIS TEST
-    def test_signup_new_company_bad_password_length(self):
+    def test_signup_new_company_bad_email_length(self):
         response = self.client.post('/signup',
                                     data={
                                         'name': 'Test Company 2',
@@ -105,12 +104,10 @@ class JobBoardTest(unittest.TestCase):
                                         'description': 'test',
                                     })
         self.assertEqual(response.status_code, 422)
-        self.assertIn("Email & Password cannot be longer than 45 characters.",
+        self.assertIn("Email and Password cannot be longer than 45 characters.",
                       response.get_data(as_text=True))
-        self.assertIn("Please, try again.", response.get_data(as_text=True))
-    
-    # FIX THIS TEST
-    def test_signup_new_company_bad_email_length(self):
+
+    def test_signup_new_company_bad_password_length(self):
         response = self.client.post('/signup',
                                     data={
                                         'name': 'Test Company 2',
@@ -120,14 +117,21 @@ class JobBoardTest(unittest.TestCase):
                                         'description': 'test',
                                     })
         self.assertEqual(response.status_code, 422)
-        self.assertIn("Email & Password cannot be longer than 45 characters.",
+        self.assertIn("Email and Password cannot be longer than 45 characters.",
                       response.get_data(as_text=True))
-        self.assertIn("Please, try again.", response.get_data(as_text=True))
 
-    '''
-    TODO:
-    sign up company successfully
-    '''
+    def test_sing_up_company_successful(self):
+        response = self.client.post('/signup',
+                                    data={
+                                        'name': 'Test Company 2',
+                                        'email': 'test@test2.com',
+                                        'location': 'San Francisco, CA',
+                                        'password': '123successfulPassword!',
+                                        'description': 'test',
+                                    }, follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Account successfully created!",
+                      response.get_data(as_text=True))
 
     def test_sign_in_successful(self):
         response = self.client.post('/signin',

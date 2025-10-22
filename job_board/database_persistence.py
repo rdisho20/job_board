@@ -68,6 +68,19 @@ class DatabasePersistence:
         
         company_emails = [result['email'] for result in results]
         return company_emails
+    
+    def find_company_by_id(self, company_id):
+        query = """
+            SELECT * FROM companies
+            WHERE id = %s
+        """
+        logger.info('Executing query: %s, with id: %d', query, company_id)
+        with self._database_connection() as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cursor:
+                cursor.execute(query, (company_id,))
+                result = cursor.fetchone()
+        
+        return dict(result)
 
     def find_company_by_email(self, email):
         query = 'SELECT * FROM companies WHERE email = %s'
