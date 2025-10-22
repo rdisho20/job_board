@@ -43,9 +43,6 @@ class DatabasePersistence:
         companies = [dict(result) for result in results]
         return companies
 
-    '''
-    REVISIT NEXT 3, need to adjust comprehension?
-    '''
     def all_company_names(self):
         query = """
             SELECT \"name\" FROM companies
@@ -56,7 +53,7 @@ class DatabasePersistence:
                 cursor.execute(query)
                 results = cursor.fetchall()
         
-        company_names = [dict(result) for result in results]
+        company_names = [result['name'] for result in results]
         return company_names
 
     def all_company_emails(self):
@@ -69,7 +66,7 @@ class DatabasePersistence:
                 cursor.execute(query)
                 results = cursor.fetchall()
         
-        company_emails = [dict(result) for result in results]
+        company_emails = [result['email'] for result in results]
         return company_emails
 
     def find_company_by_email(self, email):
@@ -82,19 +79,19 @@ class DatabasePersistence:
         
         return dict(result)
 
-    def create_new_compamy(self, name, headquarters,
+    def create_new_company(self, name, location,
                            email, password, description):
         query = dedent('INSERT INTO companies '
-                       '("name", headquarters, email, '
+                       '("name", "location", email, '
                        '"password", "description") '
                        'VALUES (%s, %s, %s, %s, %s)')
         logger.info("""Executing query: %s with name: %s,
-                    with headquarters: %s, with email: %s,
+                    with location: %s, with email: %s,
                     with password: %s, with description: %s""",
-                    query, name, headquarters, email, password, description)
+                    query, name, location, email, password, description)
         with self._database_connection() as connection:
             with connection.cursor() as cursor:
-                cursor.execute(query, (name, headquarters, email,
+                cursor.execute(query, (name, location, email,
                                        password, description))
 
     def _setup_schema(self):

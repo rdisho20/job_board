@@ -61,16 +61,20 @@ def signup():
 
 @app.route('/signup', methods=['POST'])
 def signup_company():
-    company_names = g.storage.all_company_names()
     company_emails = g.storage.all_company_emails()
+    company_names = g.storage.all_company_names()
     name = request.form['name'].strip()
-    headquarters = request.form['headquarters'].strip()
+    location = request.form['location'].strip()
     email = request.form['email'].strip()
     password = request.form['password']
     description = request.form['description'].strip()
 
-    if email in company_emails:
-        flash("An account with that email already exists. "
+    email_parts = email.split('@')
+    email_domain = email_parts[1]
+    company_domains = [email.split('@')[1] for email in company_emails]
+
+    if email_domain in company_domains:
+        flash("An account with that company domain already exists. "
               "Please, try again.", "error")
         return render_template('signup.html', name=name,
                                description=description), 422
@@ -78,7 +82,7 @@ def signup_company():
         flash("An account with that company name already exists. "
               "Please, try again.", "error")
         return render_template('signup.html', description=description), 422
-    elif not email or not password or not name:
+    elif not email or not password or not name: # take out since html handles this
         flash("Please enter required information.", "error")
         return render_template('signup.html', email=email, name=name,
                                description=description), 422
@@ -95,7 +99,7 @@ def signup_company():
     else:
         hashed = hashpw(password.encode('utf-8'), gensalt())
         hashed_password_string = hashed.decode('utf-8')
-        g.storage.add_new_company(name, headquarters, email,
+        g.storage.create_new_company(name, location, email,
                                   hashed_password_string, description)
 
         flash("Account successfully created! "
