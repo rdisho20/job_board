@@ -117,11 +117,6 @@ def signin():
 
     return render_template('signin.html')
 
-'''
-TODO:
-signed in w/ company and get error about `inject_company_id`
-- need fixing somewhere
-'''
 @app.route('/signin', methods=['POST'])
 def signin_company():
     company_email = request.form['email'].strip()
