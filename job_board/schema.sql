@@ -5,7 +5,7 @@ CREATE TABLE companies (
     email text NOT NULL UNIQUE,
     "password" text NOT NULL,
     "description" varchar(1000),
-    company_logo text
+    logo text DEFAULT 'logo_placeholder.png'
 );
 
 CREATE TABLE jobs (

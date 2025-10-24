@@ -8,6 +8,7 @@ from flask import (
     redirect,
     render_template,
     request,
+    send_from_directory,
     session,
     url_for
 )
@@ -40,11 +41,11 @@ def valid_credentials(company_email, password):
 
 @app.context_processor
 def company_signed_in():
-    return dict(company_signed_in=lambda: 'company_id' in session)
+    return dict(company_signed_in=lambda: 'company' in session)
 
 @app.context_processor
-def inject_company_id():
-    return dict(company_id=session.get('company_id'))
+def inject_company_from_session():
+    return dict(company=session.get('company'))
 
 @app.before_request
 def load_db():
@@ -73,6 +74,7 @@ def signup_company():
     password = request.form['password']
     description = request.form['description'].strip()
 
+    # split email to get domain to check against company_domains
     email_parts = email.split('@')
     email_domain = email_parts[1]
     company_domains = [email.split('@')[1] for email in company_emails]
@@ -86,10 +88,6 @@ def signup_company():
         flash("An account with that company name already exists. "
               "Please, try again.", "error")
         return render_template('signup.html', description=description), 422
-    elif not email or not password or not name: # take out since html handles this
-        flash("Please enter required information.", "error")
-        return render_template('signup.html', email=email, name=name,
-                               description=description), 422
     elif len(email) > 45 or len(password) > 45:
         flash("Email and Password cannot be longer than 45 characters.",
               "error")
@@ -111,7 +109,7 @@ def signup_company():
 
 @app.route('/signin')
 def signin():
-    if 'company_id' in session:
+    if 'company' in session:
         flash("You are already signed in!", "error")
         return redirect('index')
 
@@ -123,7 +121,7 @@ def signin_company():
     password = request.form['password'].strip()
     if valid_credentials(company_email, password):
         company = g.storage.find_company_by_email(company_email)
-        session['company_id'] = company['id']
+        session['company'] = company
         flash("You have successfully signed in!", "success")
         return redirect(url_for('index'))
     else:
@@ -132,13 +130,19 @@ def signin_company():
 
 @app.route('/signout')
 def signout():
-    if 'company_id' not in session:
+    if 'company' not in session:
         flash("You are already signed out!", "error")
         return redirect(url_for('index'))
 
-    session.pop('company_id')
+    session.pop('company')
     flash("You have successfully signed out.", "success")
     return redirect(url_for('signin'))
+
+@app.route('/companies/<int:company_id>/logo')
+def serve_logo(company_id):
+    company = g.storage.find_company_by_id(company_id)
+    logos_dir = os.path.join(get_data_path(), 'logos')
+    return send_from_directory(logos_dir, company['logo'])
 
 @app.route('/companies/<int:company_id>')
 def view_company_profile(company_id):
@@ -147,16 +151,13 @@ def view_company_profile(company_id):
 @app.route('/companies/<int:company_id>/dashboard')
 def view_company_dashboard(company_id):
     company = g.storage.find_company_by_id(company_id)
-    if 'company_id' not in session or not company:
+    if (not company
+        or 'company' not in session
+        or session['company']['id'] != company_id):
         flash("You cannot do that!", "error")
-        return redirect('index'), 422
-    
-    name = company['name']
-    location = company['location']
-    description = company['description']
-    logo = company['logo']
-    return render_template('dashboard.html', name=name, location=location,
-                           description=description, logo=logo)
+        return render_template('index.html'), 422
+
+    return render_template('dashboard.html')
 
 @app.route('/companies/<int:company_id>', methods=['POST'])
 def update_company_profile(company_id):

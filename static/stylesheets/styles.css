@@ -280,7 +280,6 @@ nav {
   box-sizing: border-box;
   display: inline-block;
   height: 125px;
-  outline: 1px solid red;
   vertical-align: top;
   width: 125px;
 }
@@ -297,4 +296,66 @@ nav {
 
 .company-description p {
   margin: 0;
+}
+
+/* ============================
+   Simple Company Dashboard
+   ============================ */
+
+.dashboard-container {
+  max-width: 700px;
+  margin: 20px auto;
+  padding: 25px;
+  background-color: #f7f8fb; /* soft light grey-blue */
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  font-family: Arial, sans-serif;
+}
+
+.company-form label {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.company-form input[type="text"],
+.company-form textarea,
+.company-form input[type="file"] {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.company-form textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.company-form button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-top: 20px;
+  background: #5b8def;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.company-form button:hover {
+  background: #4a7be0;
+}
+
+.company-logo-preview {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.company-logo-preview img {
+  max-width: 100px;
+  border-radius: 4px;
 }

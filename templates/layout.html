@@ -30,8 +30,8 @@
         <li><a href="post_job.html">Post a Job</a></li>
         {% if company_signed_in() %} <!-- using context processor @ app.py to gain access here -->
           <li>
-            <a href="{{ url_for('view_company_dashboard', company_id=company_id) }}">
-              <em>EDIT Company Profile</em>
+            <a href="{{ url_for('view_company_dashboard', company_id=company.id) }}">
+              <em>EDIT {{ company.name }}'s Profile</em>
             </a>
           </li>
           <li>

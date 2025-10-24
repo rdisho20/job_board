@@ -3,16 +3,15 @@
 {% block content %}
 <section class="company-listings">
     <h2>Company Directory</h2>
-    {{ companies }}
     {% for company in companies %}
         {% if company.id != 1 %}
             <div class="company-card">
                 <div class="company-logo">
-                    Company logo here
+                    <img src="{{ url_for('serve_logo', company_id=company.id) }}" width="125px" height="125px" alt="Company Logo">
                 </div>
                 <div class="company-heading">
                     <h3>{{ company.name }}</h3>
-                    <p><strong>Headquarters:</strong> {{ company.headquarters }}</p>
+                    <p><strong>Headquarters:</strong> {{ company.location }}</p>
                 </div>
                 <div class="company-description">
                     <p>{{ company.description }}</p>

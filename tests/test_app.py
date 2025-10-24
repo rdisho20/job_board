@@ -17,14 +17,13 @@ class JobBoardTest(unittest.TestCase):
             with conn.cursor() as cursor:
                 cursor.execute("""
                     INSERT INTO companies
-                    (name, location, email, password, description)
+                    (name, location, email, password, description, logo)
                     VALUES (%s, %s, %s, %s, %s)
                 """, ('Test Company', 'New York, NY', 'test@test.com',
                         '$2b$12$EOyJaTWBTsvtBEVJlvj1S.sqYDYujWBvWw4BZRr8p80QzfnXhJv/m',
                         'This is a test description.'))
 
         self.data_path = os.path.join(os.path.dirname(__file__), 'data')
-        #self.uploads_path = os.path.join(os.path.dirname(__file__), 'uploads')
         #app.config['UPLOAD_FOLDER'] = self.uploads_path
         os.makedirs(self.data_path, exist_ok=True)
         #os.makedirs(self.uploads_path, exist_ok=True)
@@ -50,7 +49,7 @@ class JobBoardTest(unittest.TestCase):
     def admin_session(self):
         with self.client as c:
             with c.session_transaction() as sess:
-                sess['company_email'] = 'test@test.com'
+                sess['company'] = self.storage.find_company_by_id(1)
             return c
     
     def test_view_latest_jobs(self):
@@ -98,7 +97,8 @@ class JobBoardTest(unittest.TestCase):
         response = self.client.post('/signup',
                                     data={
                                         'name': 'Test Company 2',
-                                        'email': 'toolongtest1234567890@test1234567890toolong.com',
+                                        'email': ('toolongtest1234567890@test'
+                                                  '1234567890toolong.com'),
                                         'location': 'San Francisco, CA',
                                         'password': '!aBasicPa$$word123',
                                         'description': 'test',
@@ -113,7 +113,9 @@ class JobBoardTest(unittest.TestCase):
                                         'name': 'Test Company 2',
                                         'email': 'justtesting@thisisatest.com',
                                         'location': 'San Francisco, CA',
-                                        'password': '1234567890testingOneTwoThreeFourFiveTooL@NGto$33',
+                                        'password': ('1234567890'
+                                                     'testingOneTwoThreeFour'
+                                                     'FiveTooL@NGto$33'),
                                         'description': 'test',
                                     })
         self.assertEqual(response.status_code, 422)
@@ -140,9 +142,13 @@ class JobBoardTest(unittest.TestCase):
                                         'password': 'secret',
                                     },
                                     follow_redirects=True)
+        company = self.storage.find_company_by_email('test@test.com')
         self.assertEqual(response.status_code, 200)
         self.assertIn("You have successfully signed in!",
                       response.get_data(as_text=True))
+        self.assertIn(f"EDIT {company['name']}'s Profile",
+                      response.get_data(as_text=True))
+        self.assertIn("Sign Out", response.get_data(as_text=True))
     
     def test_sign_in_failure(self):
         response = self.client.post('/signin',
@@ -154,6 +160,31 @@ class JobBoardTest(unittest.TestCase):
         self.assertEqual(response.status_code, 422)
         self.assertIn("Invalid credentials.  Please try again.",
                       response.get_data(as_text=True))
+    
+    def test_view_company_dashboard(self):
+        client = self.admin_session()
+        response = client.get('/companies/1/dashboard')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('<div class="company-logo-preview',
+                      response.get_data(as_text=True))
+        self.assertIn('accept="image/jpg,image/jpeg,image/png',
+                      response.get_data(as_text=True))
+    
+    '''
+    TODO:
+    edit this test so that we can create a fake png using bytes
+    and have it save to the data folder... need a create_image function
+    '''
+    def test_serve_logo(self):
+        logo_path = os.path.join(self.data_path, 'logos',
+                                 'logo_placeholder.png')
+        with open(logo_path, 'rb') as file:
+            file_bytes_contents = file.read()
+
+        response = self.client.get('/companies/1/logo')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content_type, 'image/png')
+        self.assertEqual(response.data, file_bytes_contents)
 
     @unittest.skip
     def test_signup_missing_required(self):
