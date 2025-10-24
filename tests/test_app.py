@@ -18,14 +18,17 @@ class JobBoardTest(unittest.TestCase):
                 cursor.execute("""
                     INSERT INTO companies
                     (name, location, email, password, description, logo)
-                    VALUES (%s, %s, %s, %s, %s)
+                    VALUES (%s, %s, %s, %s, %s, %s)
                 """, ('Test Company', 'New York, NY', 'test@test.com',
-                        '$2b$12$EOyJaTWBTsvtBEVJlvj1S.sqYDYujWBvWw4BZRr8p80QzfnXhJv/m',
-                        'This is a test description.'))
+                      ('$2b$12$EOyJaTWBTsvtBEVJlvj1S.'
+                       'sqYDYujWBvWw4BZRr8p80QzfnXhJv/m'),
+                      'This is a test description.', 'test.png'))
 
         self.data_path = os.path.join(os.path.dirname(__file__), 'data')
+        self.logos_path = os.path.join(self.data_path, 'logos')
         #app.config['UPLOAD_FOLDER'] = self.uploads_path
         os.makedirs(self.data_path, exist_ok=True)
+        os.makedirs(self.logos_path, exist_ok=True)
         #os.makedirs(self.uploads_path, exist_ok=True)
 
     def tearDown(self):
@@ -39,12 +42,10 @@ class JobBoardTest(unittest.TestCase):
 
         shutil.rmtree(self.data_path, ignore_errors=True)
         #shutil.rmtree(self.uploads_path, ignore_errors=True)
-    
-    '''
-    def create_image(self, name, content=b""):
-        with open(os.path.join(self.uploads_path, name), 'wb') as file:
+
+    def create_logo(self, name, content=b""):
+        with open(os.path.join(self.logos_path, name), 'wb') as file:
             file.write(content)
-    '''
     
     def admin_session(self):
         with self.client as c:
@@ -63,7 +64,8 @@ class JobBoardTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content_type, "text/html; charset=utf-8")
         self.assertIn("<input", response.get_data(as_text=True))
-        self.assertIn('<button type="submit"', response.get_data(as_text=True))
+        self.assertIn('<button type="submit"',
+                      response.get_data(as_text=True))
     
     def test_signup_new_company_same_company_domain(self):
         response = self.client.post('/signup',
@@ -104,7 +106,8 @@ class JobBoardTest(unittest.TestCase):
                                         'description': 'test',
                                     })
         self.assertEqual(response.status_code, 422)
-        self.assertIn("Email and Password cannot be longer than 45 characters.",
+        self.assertIn(("Email and Password cannot be longer than "
+                       "45 characters."),
                       response.get_data(as_text=True))
 
     def test_signup_new_company_bad_password_length(self):
@@ -119,7 +122,8 @@ class JobBoardTest(unittest.TestCase):
                                         'description': 'test',
                                     })
         self.assertEqual(response.status_code, 422)
-        self.assertIn("Email and Password cannot be longer than 45 characters.",
+        self.assertIn(("Email and Password cannot be longer than "
+                       "45 characters."),
                       response.get_data(as_text=True))
 
     def test_sing_up_company_successful(self):
@@ -146,7 +150,7 @@ class JobBoardTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("You have successfully signed in!",
                       response.get_data(as_text=True))
-        self.assertIn(f"EDIT {company['name']}'s Profile",
+        self.assertIn(f"{company['name']}'s DASHBOARD",
                       response.get_data(as_text=True))
         self.assertIn("Sign Out", response.get_data(as_text=True))
     
@@ -160,10 +164,23 @@ class JobBoardTest(unittest.TestCase):
         self.assertEqual(response.status_code, 422)
         self.assertIn("Invalid credentials.  Please try again.",
                       response.get_data(as_text=True))
-    
+
     def test_view_company_dashboard(self):
         client = self.admin_session()
-        response = client.get('/companies/1/dashboard')
+        response = self.client.get('/companies/1/dashboard')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Update Your Company Profile",
+                      response.get_data(as_text=True))
+        self.assertIn("Edit Your Jobs", response.get_data(as_text=True))
+
+    def test_view_company_dashboard_failure(self):
+        response = self.client.get('/companies/1/dashboard')
+        self.assertEqual(response.status_code, 422)
+        self.assertIn("You cannot do that!", response.get_data(as_text=True))
+    
+    def test_view_update_company_profile(self):
+        client = self.admin_session()
+        response = client.get('/companies/1/dashboard/update_profile')
         self.assertEqual(response.status_code, 200)
         self.assertIn('<div class="company-logo-preview',
                       response.get_data(as_text=True))
@@ -171,14 +188,15 @@ class JobBoardTest(unittest.TestCase):
                       response.get_data(as_text=True))
     
     '''
-    TODO:
-    edit this test so that we can create a fake png using bytes
-    and have it save to the data folder... need a create_image function
+    TODO
     '''
+    @unittest.skip
+    def test_update_company_profile(self):
+        pass
+
     def test_serve_logo(self):
-        logo_path = os.path.join(self.data_path, 'logos',
-                                 'logo_placeholder.png')
-        with open(logo_path, 'rb') as file:
+        self.create_logo('test.png', b"This is test content")
+        with open(os.path.join(self.logos_path, 'test.png'), 'rb') as file:
             file_bytes_contents = file.read()
 
         response = self.client.get('/companies/1/logo')
@@ -203,8 +221,10 @@ class JobBoardTest(unittest.TestCase):
     def test_signup_email_exceeds_length(self):
         response = self.client.post('/signup',
                                     data={
-                                        'email': ('thisisareallylongemailthatmaybetoolong@'
-                                                  'atthelongestaddresstoeverexist.com'),
+                                        'email': ('thisisareallylongemail'
+                                                  'thatmaybetoolong@'
+                                                  'atthelongestaddress'
+                                                  'toeverexist.com'),
                                         'password': 'Test_pass7',
                                         'company_name': 'Test'
                                     },

@@ -159,7 +159,23 @@ def view_company_dashboard(company_id):
 
     return render_template('dashboard.html')
 
-@app.route('/companies/<int:company_id>', methods=['POST'])
+'''
+TODO:
+re: DYR, move if condition into a check_company_signedin() to utilities
+'''
+@app.route('/companies/<int:company_id>/dashboard/update_profile')
+def view_update_company_profile(company_id):
+    company = g.storage.find_company_by_id(company_id)
+    if (not company
+        or 'company' not in session
+        or session['company']['id'] != company_id):
+        flash("You cannot do that!", "error")
+        return render_template('index.html'), 422
+
+    return render_template('update_company_profile.html')
+
+@app.route('/companies/<int:company_id>/dashboard/update_profile',
+           methods=['POST'])
 def update_company_profile(company_id):
     pass
 

@@ -31,7 +31,7 @@
         {% if company_signed_in() %} <!-- using context processor @ app.py to gain access here -->
           <li>
             <a href="{{ url_for('view_company_dashboard', company_id=company.id) }}">
-              <em>EDIT {{ company.name }}'s Profile</em>
+              <em>{{ company.name }}'s DASHBOARD</em>
             </a>
           </li>
           <li>

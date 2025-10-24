@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h2>Update Company Information</h2>
+{{ company }}
+<section class="dashboard-container">
+  <form class="company-form" action="#" method="POST" enctype="multipart/form-data">
+    <label for="name">Company Name</label>
+    <input type="text" id="name" name="name" value="{{ company.name }}" required>
+
+    <label for="location">Location</label>
+    <input type="text" id="location" name="location" value="{{ company.location }}" required>
+
+    <label for="description">Description</label>
+    <textarea id="description" name="description" maxlength="1000">{{ company.description }}</textarea>
+
+    <label for="company_logo">Company Logo</label>
+    <input type="file" id="company_logo" name="company_logo" accept="image/jpg,image/jpeg,image/png">
+
+    <div class="company-logo-preview">
+      <p>Current Logo:</p>
+      <img src="{{ url_for('serve_logo', company_id=company.id) }}" alt="Company Logo">
+    </div>
+
+    <button type="submit">Save Changes</button>
+  </form>
+</section>
+{% endblock %}
