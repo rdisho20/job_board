@@ -15,8 +15,7 @@ from flask import (
 from job_board.utils import (
     validate_new_password_minimum_requirements
 )
-import os
-import yaml
+from werkzeug.utils import secure_filename
 from job_board.database_persistence import DatabasePersistence
 from bcrypt import checkpw, gensalt, hashpw
 
@@ -148,6 +147,10 @@ def serve_logo(company_id):
 def view_company_profile(company_id):
     pass
 
+'''
+TODO:
+re: DYR, move if condition into a check_company_signedin() to utilities
+'''
 @app.route('/companies/<int:company_id>/dashboard')
 def view_company_dashboard(company_id):
     company = g.storage.find_company_by_id(company_id)
@@ -174,10 +177,37 @@ def view_update_company_profile(company_id):
 
     return render_template('update_company_profile.html')
 
+'''
+TODO:
+re: DYR, move if condition into a check_company_signedin() to utilities
+ALSO, need to update session w/ new company information
+'''
 @app.route('/companies/<int:company_id>/dashboard/update_profile',
            methods=['POST'])
 def update_company_profile(company_id):
-    pass
+    company = g.storage.find_company_by_id(company_id)
+    if (not company
+        or 'company' not in session
+        or session['company']['id'] != company_id):
+        flash("You cannot do that!", "error")
+        return render_template('index.html'), 422
+
+    name = request.form['name'].strip()
+    location = request.form['location'].strip()
+    description = request.form['description'].strip()
+
+    if 'company_logo' in request.files:
+        logo_file = request.files['company_logo']
+        file_extension = os.path.splitext(logo_file.filename)[1]
+        filename = f'{company_id}{file_extension}'
+        save_path = os.path.join(get_data_path(), 'logos', filename)
+        logo_file.save(save_path)
+        g.storage.update_company_profile_logo(company_id, filename)
+    
+    g.storage.update_company_profile_info(company_id, name,
+                                          location, description)
+    flash("Profile updated successfully!", "success")
+    return redirect(url_for('view_company_dashboard', company_id=company_id))
 
 @app.route('/companies/<int:company_id>/jobs')
 def show_company_job_postings(company_id):

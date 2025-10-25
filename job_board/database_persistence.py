@@ -118,6 +118,35 @@ class DatabasePersistence:
             with connection.cursor() as cursor:
                 cursor.execute(query, (name, location, email,
                                        password, description))
+    
+    def update_company_profile_info(self, company_id, name,
+                                    location, description):
+        query = """
+            UPDATE companies
+            SET name = %s, location = %s, description = %s
+            WHERE id = %s
+        """
+        logger.info("""Executing query: %s with name: %s,
+                    with location: %s, with description: %s,
+                    with company_id: %s""",
+                    query, name, location, description, company_id)
+        with self._database_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(query, (name, location,
+                                       description, company_id))
+
+    def update_company_profile_logo(self, company_id, filename):
+        query = """
+            UPDATE companies
+            SET logo = %s
+            WHERE id = %s
+        """
+        logger.info("""Executing query: %s with filename: %s,
+                    with company_id: %s""",
+                    query, filename, company_id)
+        with self._database_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(query, (filename, company_id))
 
     def _setup_schema(self):
         with self._database_connection() as connection:
