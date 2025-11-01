@@ -92,18 +92,6 @@ class DatabasePersistence:
         
         return dict(result)
 
-    '''    
-    def find_logo_path_by_id(self, company_id):
-        query = 'SELECT logo FROM companies WHERE id = company_id'
-        logger.info('Executing query: %s, with id: %s', query, company_id)
-        with self._database_connection() as conn:
-            with conn.cursor(cursor_factor=DictCursor)as cursor:
-                cursor.execute(query, (company_id,))
-                result = cursor.fetchone()
-            
-        return dict(result)
-    '''
-
     def create_new_company(self, name, location,
                            email, password, description):
         query = dedent('INSERT INTO companies '

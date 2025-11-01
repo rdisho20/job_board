@@ -2,9 +2,10 @@
 
 {% block content %}
 <h2>Update Company Information</h2>
-{{ company }}
-<section class="dashboard-container">
-  <form class="company-form" action="#" method="POST" enctype="multipart/form-data">
+{{ company }}<br><br>
+{{ file_storage_object }}
+<section class="update-info-container">
+  <form class="company-form" action="{{ url_for('update_company_profile', company_id=company.id) }}" method="POST" enctype="multipart/form-data">
     <label for="name">Company Name</label>
     <input type="text" id="name" name="name" value="{{ company.name }}" required>
 

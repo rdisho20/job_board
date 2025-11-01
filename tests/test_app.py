@@ -182,17 +182,36 @@ class JobBoardTest(unittest.TestCase):
         client = self.admin_session()
         response = client.get('/companies/1/dashboard/update_profile')
         self.assertEqual(response.status_code, 200)
-        self.assertIn('<div class="company-logo-preview',
+        self.assertIn('<label for="name">Company Name',
                       response.get_data(as_text=True))
         self.assertIn('accept="image/jpg,image/jpeg,image/png',
                       response.get_data(as_text=True))
+        self.assertIn('<button type="submit">Save Changes',
+                      response.get_data(as_text=True))
     
     '''
-    TODO
+    TODO:
+    fill out test data
     '''
-    @unittest.skip
     def test_update_company_profile(self):
-        pass
+        client = self.admin_session()
+        with (client.post('/companies/1/dashboard/update_profile',
+                          data={
+                             'name': 'Test Company 2',
+                             'location': 'Houston, TX',
+                             'description': 'testing... testing...',
+                             })) as response:
+            self.assertEqual(response.status_code, 302)
+        
+        with client.get(response.headers['Location']) as response:
+            self.assertIn("Profile updated successfully!",
+                        response.get_data(as_text=True))
+            self.assertIn('value="Test Company 2" required>',
+                        response.get_data(as_text=True))
+            self.assertIn('value="Houston, TX" required>',
+                        response.get_data(as_text=True))
+            self.assertIn('maxlength="1000">testing... testing...',
+                        response.get_data(as_text=True))
 
     def test_serve_logo(self):
         self.create_logo('test.png', b"This is test content")

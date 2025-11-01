@@ -179,8 +179,9 @@ def view_update_company_profile(company_id):
 
 '''
 TODO:
-re: DYR, move if condition into a check_company_signedin() to utilities
-ALSO, need to update session w/ new company information
+1. re: DYR, move if condition into a check_company_signedin() to utilities
+2. IF NO CHANGES HAVE BEEN MADE re-render the update profile page with a flash message
+3. if name updated, check that NO OTHER company uses that name
 '''
 @app.route('/companies/<int:company_id>/dashboard/update_profile',
            methods=['POST'])
@@ -196,7 +197,7 @@ def update_company_profile(company_id):
     location = request.form['location'].strip()
     description = request.form['description'].strip()
 
-    if 'company_logo' in request.files:
+    if request.files['company_logo'].filename:
         logo_file = request.files['company_logo']
         file_extension = os.path.splitext(logo_file.filename)[1]
         filename = f'{company_id}{file_extension}'
@@ -206,8 +207,9 @@ def update_company_profile(company_id):
     
     g.storage.update_company_profile_info(company_id, name,
                                           location, description)
+    session['company'] = g.storage.find_company_by_id(company_id)
     flash("Profile updated successfully!", "success")
-    return redirect(url_for('view_company_dashboard', company_id=company_id))
+    return redirect(url_for('update_company_profile', company_id=company_id))
 
 @app.route('/companies/<int:company_id>/jobs')
 def show_company_job_postings(company_id):
