@@ -180,8 +180,6 @@ def view_update_company_profile(company_id):
 '''
 TODO:
 1. re: DYR, move if condition into a check_company_signedin() to utilities
-2. IF NO CHANGES HAVE BEEN MADE re-render the update profile page with a flash message
-3. if name updated, check that NO OTHER company uses that name
 '''
 @app.route('/companies/<int:company_id>/dashboard/update_profile',
            methods=['POST'])
@@ -193,9 +191,15 @@ def update_company_profile(company_id):
         flash("You cannot do that!", "error")
         return render_template('index.html'), 422
 
-    name = request.form['name'].strip()
-    location = request.form['location'].strip()
-    description = request.form['description'].strip()
+    new_name = request.form['name'].strip()
+    new_location = request.form['location'].strip()
+    new_description = request.form['description'].strip()
+
+    existing_company = g.storage.find_company_by_name(new_name)
+    if existing_company:
+        flash("Changes NOT saved. A company by that name already exists, "
+              "so please choose a different name!", "error")
+        return render_template('update_company_profile.html'), 422
 
     if request.files['company_logo'].filename:
         logo_file = request.files['company_logo']
@@ -205,8 +209,8 @@ def update_company_profile(company_id):
         logo_file.save(save_path)
         g.storage.update_company_profile_logo(company_id, filename)
     
-    g.storage.update_company_profile_info(company_id, name,
-                                          location, description)
+    g.storage.update_company_profile_info(company_id, new_name,
+                                          new_location, new_description)
     session['company'] = g.storage.find_company_by_id(company_id)
     flash("Profile updated successfully!", "success")
     return redirect(url_for('update_company_profile', company_id=company_id))

@@ -200,6 +200,7 @@ class JobBoardTest(unittest.TestCase):
                              'name': 'Test Company 2',
                              'location': 'Houston, TX',
                              'description': 'testing... testing...',
+                             'company_logo': (BytesIO(b''), ''),
                              })) as response:
             self.assertEqual(response.status_code, 302)
         
