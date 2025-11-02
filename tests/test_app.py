@@ -188,11 +188,7 @@ class JobBoardTest(unittest.TestCase):
                       response.get_data(as_text=True))
         self.assertIn('<button type="submit">Save Changes',
                       response.get_data(as_text=True))
-    
-    '''
-    TODO:
-    fill out test data
-    '''
+
     def test_update_company_profile(self):
         client = self.admin_session()
         with (client.post('/companies/1/dashboard/update_profile',
@@ -223,6 +219,13 @@ class JobBoardTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content_type, 'image/png')
         self.assertEqual(response.data, file_bytes_contents)
+    
+    '''
+    TODO:
+    1. add a test job in setUp
+    '''
+    def test_show_company_job_postings(self):
+        pass
 
     @unittest.skip
     def test_signup_missing_required(self):

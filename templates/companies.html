@@ -17,7 +17,7 @@
                     <p>{{ company.description }}</p>
                     <p>
                         <strong>
-                            <a href="#">Click to see all postings by this company</a>
+                            <a href="{{ url_for('show_company_job_postings', company_id=company.id) }}">Click to see all postings by this company</a>
                         </strong>
                     </p>
                 </div>

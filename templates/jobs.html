@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<section class="job-listings">
+    <h2>{{ jobs[0].company_name }}'s Job Postings</h2>
+    {% for job in jobs %}
+    <div class="job-card">
+      <h3>{{ job.title }}</h3>
+      <p>Date posted: {{ job.posted_date }}</p>
+      <p class="company">{{ job.company_name }}</p>
+      <p class="location">{{ job.location }}</p>
+      <p>{{ job.responsibilities }}</p>
+      <p>{{ job.requirements }}</p>
+      <p>{{ job.nice_to_haves }}</p>
+      {% if job.benefits %}
+        <p>{{ job.benefits }}</p>
+      {% endif %}
+      {% if job.pay_range %}
+        <p>{{ job.pay_range }}</p>
+      {% endif %}
+      {% if job.closing_date %}
+        <p>{{ job.closing_date }}</p>
+      {% endif %}
+      <button class="btn">Apply Now</button>
+    </div>
+    {% endfor %}
+</section>
+{% endblock %}

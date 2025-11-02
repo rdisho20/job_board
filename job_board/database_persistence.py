@@ -148,6 +148,23 @@ class DatabasePersistence:
         with self._database_connection() as conn:
             with conn.cursor() as cursor:
                 cursor.execute(query, (filename, company_id))
+    
+    def find_jobs_by_company(self, company_id):
+        query = """
+            SELECT companies.id, companies.name AS company_name,
+            jobs.* FROM companies
+            JOIN jobs ON companies.id = jobs.company_id
+            WHERE companies.id = %s
+        """
+        logger.info("Executing query: %s with company_id: %s",
+                    query, company_id)
+        with self._database_connection() as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cursor:
+                cursor.execute(query, (company_id,))
+                results = cursor.fetchall()
+        
+        jobs = [dict(result) for result in results]
+        return jobs
 
     def _setup_schema(self):
         with self._database_connection() as connection:
