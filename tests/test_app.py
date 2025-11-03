@@ -5,25 +5,62 @@ import os
 from app import app
 from job_board.database_persistence import DatabasePersistence
 from io import BytesIO
+import psycopg2
 
 class JobBoardTest(unittest.TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
+        """Set up database once for all tests in this class"""
         os.environ['FLASK_ENV'] = 'test' # for accessing job_board_test database
-        app.config['TESTING'] = True # for seperate set of data files
-        self.client = app.test_client()
-        self.storage = DatabasePersistence()
+        app.config['TESTING'] = True # for seperate set :: data files
+        cls.storage = DatabasePersistence()
 
-        with self.storage._database_connection() as conn:
+        with cls.storage._database_connection() as conn:
             with conn.cursor() as cursor:
+                # Clear tables at very beginning ensuring clean slate
+                cursor.execute("""
+                    TRUNCATE TABLE companies, jobs, employment_types,
+                    departments, employment_types_jobs, departments_jobs
+                    RESTART IDENTITY
+                """)
+
+                # Insert common data that all tests can use
                 cursor.execute("""
                     INSERT INTO companies
                     (name, location, email, password, description, logo)
                     VALUES (%s, %s, %s, %s, %s, %s)
+                    RETURNING id
                 """, ('Test Company', 'New York, NY', 'test@test.com',
                       ('$2b$12$EOyJaTWBTsvtBEVJlvj1S.'
                        'sqYDYujWBvWw4BZRr8p80QzfnXhJv/m'),
                       'This is a test description.', 'test.png'))
 
+                # Fetch the returned ID
+                company_id = cursor.fetchone()[0]
+
+                cursor.execute("""
+                    INSERT INTO jobs
+                    (title, "location", role_overview, responsibilities,
+                    requirements, nice_to_haves, company_id)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                """, ('Job Title Test', 'Test, TST', 'Overview of Role',
+                      'Job Responsibilities Test', 'Job Requirements Test',
+                      'Nice to Haves Test', company_id))
+    
+    @classmethod
+    def tearDownClass(cls):
+        """Clean up database once after all tests in this class"""
+        storage = DatabasePersistence()
+        with storage._database_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute("""
+                    TRUNCATE TABLE companies, jobs, employment_types,
+                    departments, employment_types_jobs, departments_jobs
+                    RESTART IDENTITY
+                """)
+
+    def setUp(self):
+        self.client = app.test_client()
         self.data_path = os.path.join(os.path.dirname(__file__), 'data')
         self.logos_path = os.path.join(self.data_path, 'logos')
         #app.config['UPLOAD_FOLDER'] = self.uploads_path
@@ -32,14 +69,6 @@ class JobBoardTest(unittest.TestCase):
         #os.makedirs(self.uploads_path, exist_ok=True)
 
     def tearDown(self):
-        query = """
-            TRUNCATE TABLE companies, jobs, employment_types, departments,
-            employment_types_jobs, departments_jobs RESTART IDENTITY
-        """
-        with self.storage._database_connection() as conn:
-            with conn.cursor() as cursor:
-                cursor.execute(query)
-
         shutil.rmtree(self.data_path, ignore_errors=True)
         #shutil.rmtree(self.uploads_path, ignore_errors=True)
 
@@ -50,7 +79,7 @@ class JobBoardTest(unittest.TestCase):
     def admin_session(self):
         with self.client as c:
             with c.session_transaction() as sess:
-                sess['company'] = self.storage.find_company_by_id(1)
+                sess['company'] = JobBoardTest.storage.find_company_by_id(1)
             return c
     
     def test_view_latest_jobs(self):
@@ -146,7 +175,7 @@ class JobBoardTest(unittest.TestCase):
                                         'password': 'secret',
                                     },
                                     follow_redirects=True)
-        company = self.storage.find_company_by_email('test@test.com')
+        company = JobBoardTest.storage.find_company_by_email('test@test.com')
         self.assertEqual(response.status_code, 200)
         self.assertIn("You have successfully signed in!",
                       response.get_data(as_text=True))
@@ -219,13 +248,16 @@ class JobBoardTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content_type, 'image/png')
         self.assertEqual(response.data, file_bytes_contents)
-    
-    '''
-    TODO:
-    1. add a test job in setUp
-    '''
+
     def test_show_company_job_postings(self):
-        pass
+        response = self.client.get('/companies/1/jobs')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("<h4>Responsibilities:</h4>",
+                      response.get_data(as_text=True))
+        self.assertIn("<h4>Requirements:</h4>",
+                      response.get_data(as_text=True))
+        self.assertIn("<h4>Nice to Have:</h4>",
+                      response.get_data(as_text=True))
 
     @unittest.skip
     def test_signup_missing_required(self):

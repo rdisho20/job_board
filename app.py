@@ -215,12 +215,12 @@ def update_company_profile(company_id):
     flash("Profile updated successfully!", "success")
     return redirect(url_for('update_company_profile', company_id=company_id))
 
-'''
-TODO:
-1. account for admin's id, incase wiseguy (id: 1)
-'''
 @app.route('/companies/<int:company_id>/jobs')
 def show_company_job_postings(company_id):
+    if company_id == 1:
+        flash("You cannot do that!", "error")
+        return render_template('index.html'), 422
+
     jobs = g.storage.find_jobs_by_company(company_id)
     return render_template('jobs.html', jobs=jobs)
 

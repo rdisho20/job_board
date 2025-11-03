@@ -152,7 +152,11 @@ class DatabasePersistence:
     def find_jobs_by_company(self, company_id):
         query = """
             SELECT companies.id, companies.name AS company_name,
-            jobs.* FROM companies
+            companies.email,
+            jobs.id, jobs.title, jobs.location, jobs.role_overview,
+            jobs.responsibilities, jobs.requirements, jobs.nice_to_haves,
+            jobs.benefits, jobs.pay_range, jobs.posted_date::date,
+            jobs.closing_date, jobs.company_id FROM companies
             JOIN jobs ON companies.id = jobs.company_id
             WHERE companies.id = %s
         """
