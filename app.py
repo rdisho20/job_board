@@ -196,7 +196,7 @@ def update_company_profile(company_id):
     new_description = request.form['description'].strip()
 
     existing_company = g.storage.find_company_by_name(new_name)
-    if existing_company:
+    if existing_company and existing_company['id'] != company_id:
         flash("Changes NOT saved. A company by that name already exists, "
               "so please choose a different name!", "error")
         return render_template('update_company_profile.html'), 422
@@ -217,7 +217,9 @@ def update_company_profile(company_id):
 
 @app.route('/companies/<int:company_id>/jobs')
 def show_company_job_postings(company_id):
-    if company_id == 1:
+    company = g.storage.find_company_by_id(company_id)
+    if (company['name'].casefold() == 'admin' or
+        company['name'].casefold() == 'administrator'):
         flash("You cannot do that!", "error")
         return render_template('index.html'), 422
 

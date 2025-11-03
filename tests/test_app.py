@@ -2,10 +2,10 @@ import unittest
 import shutil
 from flask import session
 import os
+
 from app import app
 from job_board.database_persistence import DatabasePersistence
 from io import BytesIO
-import psycopg2
 
 class JobBoardTest(unittest.TestCase):
     @classmethod
@@ -46,6 +46,15 @@ class JobBoardTest(unittest.TestCase):
                 """, ('Job Title Test', 'Test, TST', 'Overview of Role',
                       'Job Responsibilities Test', 'Job Requirements Test',
                       'Nice to Haves Test', company_id))
+                
+                cursor.execute("""
+                    INSERT INTO companies
+                    (name, location, email, password, description, logo)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                """, ('Existing Company', 'New York, NY', 'exists@alive.com',
+                      ('$2b$12$EOyJaTWBTsvtBEVJlvj1S.'
+                       'sqYDYujWBvWw4BZRr8p80QzfnXhJv/m'),
+                      'This is a test description.', 'test.png'))
     
     @classmethod
     def tearDownClass(cls):
@@ -114,7 +123,7 @@ class JobBoardTest(unittest.TestCase):
         response = self.client.post('/signup',
                                     data={
                                         'name': 'Test Company',
-                                        'email': 'test@test2.com',
+                                        'email': 'test@test3.com',
                                         'location': 'San Francisco, CA',
                                         'password': 'test',
                                         'description': 'test',
@@ -127,7 +136,7 @@ class JobBoardTest(unittest.TestCase):
     def test_signup_new_company_bad_email_length(self):
         response = self.client.post('/signup',
                                     data={
-                                        'name': 'Test Company 2',
+                                        'name': 'Test Company 3',
                                         'email': ('toolongtest1234567890@test'
                                                   '1234567890toolong.com'),
                                         'location': 'San Francisco, CA',
@@ -142,7 +151,7 @@ class JobBoardTest(unittest.TestCase):
     def test_signup_new_company_bad_password_length(self):
         response = self.client.post('/signup',
                                     data={
-                                        'name': 'Test Company 2',
+                                        'name': 'Test Company 4',
                                         'email': 'justtesting@thisisatest.com',
                                         'location': 'San Francisco, CA',
                                         'password': ('1234567890'
@@ -155,7 +164,7 @@ class JobBoardTest(unittest.TestCase):
                        "45 characters."),
                       response.get_data(as_text=True))
 
-    def test_sing_up_company_successful(self):
+    def test_sign_up_company_successful(self):
         response = self.client.post('/signup',
                                     data={
                                         'name': 'Test Company 2',
@@ -218,21 +227,34 @@ class JobBoardTest(unittest.TestCase):
         self.assertIn('<button type="submit">Save Changes',
                       response.get_data(as_text=True))
 
+    def test_update_company_profile_w_existing_company(self):
+        client = self.admin_session()
+        with (client.post('/companies/1/dashboard/update_profile',
+                          data={
+                             'name': 'Existing Company',
+                             'location': 'Houston, TX',
+                             'description': 'testing... testing...',
+                             'company_logo': (BytesIO(b''), ''),
+                             })) as response:
+            self.assertEqual(response.status_code, 422)
+            self.assertIn("Changes NOT saved.",
+                          response.get_data(as_text=True))
+
     def test_update_company_profile(self):
         client = self.admin_session()
         with (client.post('/companies/1/dashboard/update_profile',
                           data={
-                             'name': 'Test Company 2',
+                             'name': 'New Company Name',
                              'location': 'Houston, TX',
                              'description': 'testing... testing...',
                              'company_logo': (BytesIO(b''), ''),
                              })) as response:
             self.assertEqual(response.status_code, 302)
-        
+
         with client.get(response.headers['Location']) as response:
             self.assertIn("Profile updated successfully!",
                         response.get_data(as_text=True))
-            self.assertIn('value="Test Company 2" required>',
+            self.assertIn('value="New Company Name" required>',
                         response.get_data(as_text=True))
             self.assertIn('value="Houston, TX" required>',
                         response.get_data(as_text=True))
