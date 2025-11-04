@@ -79,6 +79,9 @@ class DatabasePersistence:
             with conn.cursor(cursor_factory=DictCursor) as cursor:
                 cursor.execute(query, (company_id,))
                 result = cursor.fetchone()
+
+                if not result:
+                    return None
         
         return dict(result)
     
@@ -102,6 +105,9 @@ class DatabasePersistence:
             with conn.cursor(cursor_factory=DictCursor) as cursor:
                 cursor.execute(query, (email,))
                 result = cursor.fetchone()
+
+                if not result:
+                    return None
         
         return dict(result)
 
@@ -149,7 +155,7 @@ class DatabasePersistence:
             with conn.cursor() as cursor:
                 cursor.execute(query, (filename, company_id))
     
-    def find_jobs_by_company(self, company_id):
+    def find_jobs_by_company_id(self, company_id):
         query = """
             SELECT companies.id, companies.name AS company_name,
             companies.email,

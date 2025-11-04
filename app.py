@@ -162,20 +162,6 @@ def serve_logo(company_id):
     logos_dir = os.path.join(get_data_path(), 'logos')
     return send_from_directory(logos_dir, company['logo'])
 
-'''
-TODO:
-- Implement test for viewing company profile
-- Edit template to show 3 most recent job postings
-'''
-@app.route('/companies/<int:company_id>')
-def view_company_profile(company_id):
-    company = g.storage.find_company_by_id(company_id)
-    if (company['id'] == 1 or not company):
-        flash("No company to show.", "error")
-        return render_template('index.html'), 422
-    
-    return render_template('profile.html', company=company)
-
 @app.route('/companies/<int:company_id>/dashboard')
 @company_id_verification_required_w_session
 def view_company_dashboard(company_id):
@@ -214,6 +200,22 @@ def update_company_profile(company_id):
     flash("Profile updated successfully!", "success")
     return redirect(url_for('update_company_profile', company_id=company_id))
 
+'''
+TODO:
+- Implement check for if any job(s) exist, if they don't
+provide a different message in 'Recent Job Postings' section
+- consider adding style seperating 'Recent Job Postings' section
+'''
+@app.route('/companies/<int:company_id>')
+def view_company_profile(company_id):
+    company = g.storage.find_company_by_id(company_id)
+    jobs = g.storage.find_jobs_by_company_id(company_id)
+    if not company or company.get('id') == 1:
+        flash("No company profile to show.", "error")
+        return render_template('index.html'), 422
+    
+    return render_template('profile.html', company=company, jobs=jobs)
+
 @app.route('/companies/<int:company_id>/jobs')
 def show_company_job_postings(company_id):
     company = g.storage.find_company_by_id(company_id)
@@ -222,8 +224,8 @@ def show_company_job_postings(company_id):
         flash("You cannot do that!", "error")
         return render_template('index.html'), 422
 
-    jobs = g.storage.find_jobs_by_company(company_id)
-    return render_template('jobs.html', jobs=jobs)
+    jobs = g.storage.find_jobs_by_company_id(company_id)
+    return render_template('jobs.html', company=company, jobs=jobs)
 
 @app.route('/companies/<int:company_id>/jobs/<int:job_id>', methods=['POST'])
 def edit_job(company_id):

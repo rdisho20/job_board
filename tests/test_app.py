@@ -280,6 +280,20 @@ class JobBoardTest(unittest.TestCase):
                       response.get_data(as_text=True))
         self.assertIn("<h4>Nice to Have:</h4>",
                       response.get_data(as_text=True))
+    
+    def test_show_company_profile_incorrect_id(self):
+        response = self.client.get('/companies/9')
+        self.assertEqual(response.status_code, 422)
+        self.assertIn('No company profile to show.',
+                      response.get_data(as_text=True))
+
+    def test_show_company_profile(self):
+        response = self.client.get('/companies/2')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('<h3>Existing Company',
+                      response.get_data(as_text=True))
+        self.assertIn('<a href="mailto:exists@alive.com">Contact Company',
+                      response.get_data(as_text=True))
 
     @unittest.skip
     def test_signup_missing_required(self):
