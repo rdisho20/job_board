@@ -38,6 +38,25 @@ def valid_credentials(company_email, password):
     else:
         return False
 
+def company_id_verification_required_w_session(f):
+    '''
+    Custom decorator for verifying that company_id exists
+    and that it matches the company_id in current session
+    '''
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        company_id = kwargs.get('company_id')
+        company = g.storage.find_company_by_id(company_id)
+        if (not company
+            or 'company' not in session
+            or session['company']['id'] != company_id):
+            flash("You cannot do that!", "error")
+            return render_template('index.html'), 422
+
+        return f(*args, **kwargs)
+
+    return decorated_function
+
 @app.context_processor
 def company_signed_in():
     return dict(company_signed_in=lambda: 'company' in session)
@@ -143,54 +162,28 @@ def serve_logo(company_id):
     logos_dir = os.path.join(get_data_path(), 'logos')
     return send_from_directory(logos_dir, company['logo'])
 
+'''
+TODO:
+Implement viewing company's public profile
+'''
 @app.route('/companies/<int:company_id>')
 def view_company_profile(company_id):
     pass
 
-'''
-TODO:
-re: DYR, move if condition into a check_company_signedin() to utilities
-'''
 @app.route('/companies/<int:company_id>/dashboard')
+@company_id_verification_required_w_session
 def view_company_dashboard(company_id):
-    company = g.storage.find_company_by_id(company_id)
-    if (not company
-        or 'company' not in session
-        or session['company']['id'] != company_id):
-        flash("You cannot do that!", "error")
-        return render_template('index.html'), 422
-
     return render_template('dashboard.html')
 
-'''
-TODO:
-re: DYR, move if condition into a check_company_signedin() to utilities
-'''
 @app.route('/companies/<int:company_id>/dashboard/update_profile')
+@company_id_verification_required_w_session
 def view_update_company_profile(company_id):
-    company = g.storage.find_company_by_id(company_id)
-    if (not company
-        or 'company' not in session
-        or session['company']['id'] != company_id):
-        flash("You cannot do that!", "error")
-        return render_template('index.html'), 422
-
     return render_template('update_company_profile.html')
 
-'''
-TODO:
-1. re: DYR, move if condition into a check_company_signedin() to utilities
-'''
 @app.route('/companies/<int:company_id>/dashboard/update_profile',
            methods=['POST'])
+@company_id_verification_required_w_session
 def update_company_profile(company_id):
-    company = g.storage.find_company_by_id(company_id)
-    if (not company
-        or 'company' not in session
-        or session['company']['id'] != company_id):
-        flash("You cannot do that!", "error")
-        return render_template('index.html'), 422
-
     new_name = request.form['name'].strip()
     new_location = request.form['location'].strip()
     new_description = request.form['description'].strip()
