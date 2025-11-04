@@ -164,11 +164,17 @@ def serve_logo(company_id):
 
 '''
 TODO:
-Implement viewing company's public profile
+- Implement test for viewing company profile
+- Edit template to show 3 most recent job postings
 '''
 @app.route('/companies/<int:company_id>')
 def view_company_profile(company_id):
-    pass
+    company = g.storage.find_company_by_id(company_id)
+    if (company['id'] == 1 or not company):
+        flash("No company to show.", "error")
+        return render_template('index.html'), 422
+    
+    return render_template('profile.html', company=company)
 
 @app.route('/companies/<int:company_id>/dashboard')
 @company_id_verification_required_w_session

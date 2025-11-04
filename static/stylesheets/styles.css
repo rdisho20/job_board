@@ -142,6 +142,7 @@ nav {
     background-color: #f7f7f9; /* matches body bg */
     border-bottom: 1px solid #e1e4ea;
     padding: 12px 20px;
+    margin-bottom: 30px;
   }
   
   nav ul {
@@ -280,13 +281,13 @@ nav {
   box-sizing: border-box;
   display: inline-block;
   height: 125px;
-  vertical-align: top;
+  vertical-align: middle;
   width: 125px;
 }
 
 .company-heading {
   display: inline-block;
-  vertical-align: top;
+  vertical-align: middle;
   margin-left: 20px;
 }
 

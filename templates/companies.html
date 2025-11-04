@@ -10,7 +10,7 @@
                     <img src="{{ url_for('serve_logo', company_id=company.id) }}" width="125px" height="125px" alt="Company Logo">
                 </div>
                 <div class="company-heading">
-                    <h3>{{ company.name }}</h3>
+                    <h3><a href="{{ url_for('view_company_profile', company_id=company.id)}}">{{ company.name }}</a></h3>
                     <p><strong>Headquarters:</strong> {{ company.location }}</p>
                 </div>
                 <div class="company-description">

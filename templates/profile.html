@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<section class="company-listings">
+    <div class="company-card">
+        <div class="company-logo">
+            <img src="{{ url_for('serve_logo', company_id=company.id) }}" width="125px" height="125px" alt="Company Logo">
+        </div>
+        <div class="company-heading">
+            <h3>{{ company.name }}</h3>
+            <p><strong>Headquarters:</strong> {{ company.location }}</p>
+            <p>
+                <strong><a href="mailto:{{ company.email }}">Contact Company</a></strong>
+            </p>
+        </div>
+        <div class="company-description">
+            <p>{{ company.description }}</p>
+            <p>
+                <strong>
+                    <a href="{{ url_for('show_company_job_postings', company_id=company.id) }}">Click to see all postings by this company</a>
+                </strong>
+            </p>
+        </div>
+    </div>
+
+    <p><strong>TODO: Company's recent jobs can go here (do after implementing homepage w/ latest jobs)</strong></p>
+
+</section>
+{% endblock %}
