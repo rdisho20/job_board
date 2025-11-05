@@ -360,3 +360,64 @@ nav {
   max-width: 100px;
   border-radius: 4px;
 }
+
+/* ============================
+   Simple Job Post Form
+   ============================ */
+
+.job-form-container {
+  max-width: 700px;
+  margin: 50px auto;
+  padding: 20px;
+  background: #f7f8fa;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  font-family: Arial, sans-serif;
+}
+
+.job-form-container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #2c3e50;
+}
+
+.job-form label {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.job-form input[type="text"],
+.job-form input[type="date"],
+.job-form textarea {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+
+.job-form textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.job-form button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-top: 20px;
+  background: #5b8def;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.job-form button:hover {
+  background: #4a7be0;
+}

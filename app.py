@@ -65,6 +65,12 @@ def company_signed_in():
 def inject_company_from_session():
     return dict(company=session.get('company'))
 
+@app.context_processor
+def inject_employment_types_and_departments():
+    employment_types = g.storage.get_employment_types()
+    departments = g.storage.get_departments()
+    return dict(departments=departments, employment_types=employment_types)
+
 @app.before_request
 def load_db():
     g.storage = DatabasePersistence()
@@ -200,12 +206,6 @@ def update_company_profile(company_id):
     flash("Profile updated successfully!", "success")
     return redirect(url_for('update_company_profile', company_id=company_id))
 
-'''
-TODO:
-- Implement check for if any job(s) exist, if they don't
-provide a different message in 'Recent Job Postings' section
-- consider adding style seperating 'Recent Job Postings' section
-'''
 @app.route('/companies/<int:company_id>')
 def view_company_profile(company_id):
     company = g.storage.find_company_by_id(company_id)
@@ -227,7 +227,33 @@ def show_company_job_postings(company_id):
     jobs = g.storage.find_jobs_by_company_id(company_id)
     return render_template('jobs.html', company=company, jobs=jobs)
 
-@app.route('/companies/<int:company_id>/jobs/<int:job_id>', methods=['POST'])
+@app.route('/post_job')
+def view_post_job_form():
+    if not session:
+        flash("You must be logged in to do that.", "error")
+        return render_template('index.html'), 422
+
+    return render_template('post_job.html')
+
+@app.route('/post_job/<int:company_id>/jobs/post', methods=['POST'])
+@company_id_verification_required_w_session
+def post_job(company_id):
+    title = request.form['title'].strip()
+    location = request.form['location'].strip()
+    employment_type = request.form['employment_type']
+    department = request.form['department']
+    role_overview = request.form['role_overview'].strip()
+    responsibilities = request.form['responsibilities'].strip()
+    requirements = request.form['requirements'].strip()
+    nice_to_haves = request.form['nice_to_haves'].strip()
+    benefits = request.form['benefits'].strip()
+    pay_range = request.form['pay_range'].strip()
+    closing_date = request.form['closing_date']
+    
+    pass
+
+@app.route('/post_job/<int:company_id>/jobs/<int:job_id>', methods=['POST'])
+@company_id_verification_required_w_session
 def edit_job(company_id):
     pass
 

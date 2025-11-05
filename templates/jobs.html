@@ -3,35 +3,39 @@
 {% block content %}
 <section class="job-listings">
     <h2>{{ company.name }}'s Job Postings</h2>
-    {% for job in jobs %}
-    <div class="job-card" id="{{ job.id }}">
-        <h3>{{ job.title }}</h3>
-        <p>
-            <strong>Date posted:</strong> {{ job.posted_date }} |
-            {% if job.closing_date %}
-                <strong>Closing Date:</strong> {{ job.closing_date }}
-            {% endif %}
-        </p>
-        <p class="location">{{ job.location }}</p>
-        <p>{{ job.role_overview }}</p>
-        <h4>Responsibilities:</h4>
-        <p>{{ job.responsibilities }}</p>
-        <h4>Requirements:</h4>
-        <p>{{ job.requirements }}</p>
-        <h4>Nice to Have:</h4>
-        <p>{{ job.nice_to_haves }}</p>
-        {% if job.benefits %}
-            <h4>Benefits:</h4>
-            <p>{{ job.benefits }}</p>
-        {% endif %}
-        {% if job.pay_range %}
-            <h4>Pay Range:</h4>
-            <p>{{ job.pay_range }}</p>
-        {% endif %}
-        <a href="mailto:{{ job.email }}">
-            <button class="btn">Apply Now</button>
-        </a>
-    </div>
-    {% endfor %}
+    {% if not jobs %}
+        <p>No postings to show</p>
+    {% else %}
+        {% for job in jobs %}
+            <div class="job-card" id="{{ job.id }}">
+                <h3>{{ job.title }}</h3>
+                <p>
+                    <strong>Date posted:</strong> {{ job.posted_date }} |
+                    {% if job.closing_date %}
+                        <strong>Closing Date:</strong> {{ job.closing_date }}
+                    {% endif %}
+                </p>
+                <p class="location">{{ job.location }}</p>
+                <p>{{ job.role_overview }}</p>
+                <h4>Responsibilities:</h4>
+                <p>{{ job.responsibilities }}</p>
+                <h4>Requirements:</h4>
+                <p>{{ job.requirements }}</p>
+                <h4>Nice to Have:</h4>
+                <p>{{ job.nice_to_haves }}</p>
+                {% if job.benefits %}
+                    <h4>Benefits:</h4>
+                    <p>{{ job.benefits }}</p>
+                {% endif %}
+                {% if job.pay_range %}
+                    <h4>Pay Range:</h4>
+                    <p>{{ job.pay_range }}</p>
+                {% endif %}
+                <a href="mailto:{{ job.email }}">
+                    <button class="btn">Apply Now</button>
+                </a>
+            </div>
+        {% endfor %}
+    {% endif %}
 </section>
 {% endblock %}

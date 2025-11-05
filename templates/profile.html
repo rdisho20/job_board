@@ -26,28 +26,35 @@
 
     <section class="job-listings">
         <h2>{{ company.name }}'s Recent Job Postings</h2>
-        {% for job in jobs %}
-        {% if loop.index0 == 3 %}
-            {{ break }}
-        {% endif %}
-        <div class="job-card">
-            <h3>{{ job.title }}</h3>
-            <p>
-                Date posted: {{ job.posted_date }} |
-                {% if job.closing_date %}
-                    <strong>Closing Date:</strong> {{ job.closing_date }}
+        {% if not jobs %}
+            <p>No postings to show</p>
+        {% else %}
+            {% for job in jobs %}
+                {% if loop.index0 == 3 %}
+                    {{ break }}
                 {% endif %}
-            </p>
-            <p class="location">{{ job.location }}</p>
-            <p>{{ job.role_overview }}</p>
-            {% if job.pay_range %}
-                <p>{{ job.pay_range }}</p>
-            {% endif %}
-            <a href="{{ url_for('show_company_job_postings', company_id=company.id) }}#{{ job.id }}">
-                Click to read more and apply
-            </a>
-        </div>
-        {% endfor %}
+                <div class="job-card">
+                    <h3>{{ job.title }}</h3>
+                    <p>
+                        Date posted: {{ job.posted_date }} |
+                        {% if job.closing_date %}
+                            <strong>Closing Date:</strong> {{ job.closing_date }}
+                        {% endif %}
+                    </p>
+                    <p class="location">{{ job.location }}</p>
+                    <p>{{ job.role_overview }}</p>
+                    {% if job.pay_range %}
+                        <p>{{ job.pay_range }}</p>
+                    {% endif %}
+                    <a href="{{ url_for('show_company_job_postings', company_id=company.id) }}#{{ job.id }}">
+                        Click to read more and apply
+                    </a>
+                </div>
+            {% endfor %}
+            <h4>
+                <a href="{{ url_for('show_company_job_postings', company_id=company.id )}}">Click to view all job postings<a>
+            </h4>
+        {% endif %}
     </section>
 
 </section>

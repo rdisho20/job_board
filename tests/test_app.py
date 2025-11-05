@@ -294,6 +294,21 @@ class JobBoardTest(unittest.TestCase):
                       response.get_data(as_text=True))
         self.assertIn('<a href="mailto:exists@alive.com">Contact Company',
                       response.get_data(as_text=True))
+    
+    def test_view_post_job_form_error(self):
+        response = self.client.get('/post_job')
+        self.assertEqual(response.status_code, 422)
+        self.assertIn('You must be logged in to do that.',
+                      response.get_data(as_text=True))
+        
+    def test_view_post_job_form(self):
+        client = self.admin_session()
+        response = client.get('/post_job')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('Post a New Job',
+                      response.get_data(as_text=True))
+        self.assertIn('<button type="submit">Post Job',
+                      response.get_data(as_text=True))
 
     @unittest.skip
     def test_signup_missing_required(self):

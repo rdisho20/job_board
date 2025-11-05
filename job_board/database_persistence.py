@@ -176,6 +176,42 @@ class DatabasePersistence:
         jobs = [dict(result) for result in results]
         return jobs
 
+    def get_employment_types(self):
+        query = "SELECT * FROM employment_types"
+        logger.info("Executing query: %s", query)
+        with self._database_connection() as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cursor:
+                cursor.execute(query)
+                results = cursor.fetchall()
+        
+        employment_types = [dict(result) for result in results]
+        return employment_types
+
+    def get_departments(self):
+        query = "SELECT * FROM departments ORDER BY name"
+        logger.info("Executing query: %s", query)
+        with self._database_connection() as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cursor:
+                cursor.execute(query)
+                results = cursor.fetchall()
+        
+        departments = [dict(result) for result in results]
+        return departments
+    
+    '''
+    TODO:
+    - figure out where/how to add fields not given values
+    to the jobs table
+    '''
+    def post_new_job(self):
+        query = """
+            INSERT INTO jobs (title, location, role_overview,
+            responsibilities, requirements, nice_to_haves, benefits,
+            pay_range, closing_date, company_id)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+
+        """
+
     def _setup_schema(self):
         with self._database_connection() as connection:
             with connection.cursor() as cursor:

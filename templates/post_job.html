@@ -1,0 +1,54 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<section class="job-form-container">
+    <h2>Post a New Job</h2>
+
+    <form class="job-form" action="#" method="POST">
+        <label for="title">Job Title (required)</label>
+        <input type="text" id="title" name="title" required>
+
+        <label for="employment_type">Employment Type (required)</label>
+        <select id="employment_type" name="employment_type">
+            <option value="">--Please choose an option--</option>
+            {% for type in employment_types %}
+                <option value="{{ type.id }}">{{ type.type }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="department">Department (required)</label>
+        <select id="department" name="department">
+            <option value="">--Please choose an option--</option>
+            {% for department in departments %}
+                <option value="{{ department.id }}">{{ department.name }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="location">Location (required)</label>
+        <input type="text" id="location" name="location" required>
+
+        <label for="role_overview">Role Overview (required)</label>
+        <textarea id="role_overview" name="role_overview" required></textarea>
+
+        <label for="responsibilities">Responsibilities (required)</label>
+        <textarea id="responsibilities" name="responsibilities" required></textarea>
+
+        <label for="requirements">Requirements (required)</label>
+        <textarea id="requirements" name="requirements" required></textarea>
+
+        <label for="nice_to_haves">Nice to Haves</label>
+        <textarea id="nice_to_haves" name="nice_to_haves"></textarea>
+
+        <label for="benefits">Benefits</label>
+        <textarea id="benefits" name="benefits"></textarea>
+
+        <label for="pay_range">Pay Range</label>
+        <input type="text" id="pay_range" name="pay_range">
+
+        <label for="closing_date">Closing Date</label>
+        <input type="date" id="closing_date" name="closing_date">
+
+        <button type="submit">Post Job</button>
+    </form>
+</section>
+{% endblock %}

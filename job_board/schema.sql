@@ -70,3 +70,33 @@ VALUES
 ('Starlight Gaming', 'Los Angeles, CA', 'hr@starlightgaming.com', '$2b$12$EOyJaTWBTsvtBEVJlvj1S.sqYDYujWBvWw4BZRr8p80QzfnXhJv/m', 'An independent game development studio creating immersive and engaging experiences for players worldwide.'),
 ('Apex Health', 'Chicago, IL', 'connect@apexhealth.com', '$2b$12$EOyJaTWBTsvtBEVJlvj1S.sqYDYujWBvWw4BZRr8p80QzfnXhJv/m', 'A healthcare technology company focused on improving patient outcomes through data analytics.'),
 ('SilverLining Finance', 'London, UK', 'contact@silverlining.finance', '$2b$12$EOyJaTWBTsvtBEVJlvj1S.sqYDYujWBvWw4BZRr8p80QzfnXhJv/m', 'Providing cutting-edge fintech solutions for personal and corporate finance management.');
+
+INSERT INTO employment_types (type)
+VALUES ('Full-time'), ('Part-time'), ('Contract'), ('Seasonal');
+
+INSERT INTO departments (name)
+VALUES
+  ('Accounting'),
+  ('Business Development'),
+  ('Compliance'),
+  ('Content & Communications'),
+  ('Customer Support'),
+  ('Data Science'),
+  ('Design'),
+  ('Education & Training'),
+  ('Engineering'),
+  ('Facilities & Maintenance'),
+  ('Finance'),
+  ('Healthcare Services'),
+  ('Human Resources'),
+  ('Information Technology'),
+  ('Legal'),
+  ('Manufacturing & Production'),
+  ('Marketing'),
+  ('Operations'),
+  ('Product Management'),
+  ('Quality Assurance'),
+  ('Research & Development'),
+  ('Sales'),
+  ('Security'),
+  ('Supply Chain & Logistics');
