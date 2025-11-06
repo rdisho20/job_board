@@ -249,8 +249,17 @@ def post_job(company_id):
     benefits = request.form['benefits'].strip()
     pay_range = request.form['pay_range'].strip()
     closing_date = request.form['closing_date']
+
+    final_benefits = benefits if benefits else None
+    final_pay_range = pay_range if pay_range else None
+    final_closing_date = closing_date if closing_date else None
+
+    g.storage.insert_new_job(title, location, employment_type, department,
+                             role_overview, responsibilities, requirements,
+                             nice_to_haves, final_benefits, final_pay_range,
+                             final_closing_date, company_id)
     
-    pass
+    return redirect(url_for('view_company_profile', company_id=company_id))
 
 @app.route('/post_job/<int:company_id>/jobs/<int:job_id>', methods=['POST'])
 @company_id_verification_required_w_session

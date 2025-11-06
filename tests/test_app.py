@@ -309,6 +309,11 @@ class JobBoardTest(unittest.TestCase):
                       response.get_data(as_text=True))
         self.assertIn('<button type="submit">Post Job',
                       response.get_data(as_text=True))
+    
+    '''
+    TODO:
+    - test posting new job
+    '''
 
     @unittest.skip
     def test_signup_missing_required(self):

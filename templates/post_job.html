@@ -4,7 +4,7 @@
 <section class="job-form-container">
     <h2>Post a New Job</h2>
 
-    <form class="job-form" action="#" method="POST">
+    <form class="job-form" action="{{ url_for('post_job', company_id=company.id)}}" method="POST">
         <label for="title">Job Title (required)</label>
         <input type="text" id="title" name="title" required>
 

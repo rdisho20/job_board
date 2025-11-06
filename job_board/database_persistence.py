@@ -162,8 +162,17 @@ class DatabasePersistence:
             jobs.id, jobs.title, jobs.location, jobs.role_overview,
             jobs.responsibilities, jobs.requirements, jobs.nice_to_haves,
             jobs.benefits, jobs.pay_range, jobs.posted_date::date,
-            jobs.closing_date, jobs.company_id FROM companies
+            jobs.closing_date, jobs.company_id, employment_types.type,
+            departments.name AS department,
+            employment_types_jobs.employment_type_id,
+            employment_types_jobs.job_id,
+            departments_jobs.department_id, departments_jobs.job_id
+            FROM companies
             JOIN jobs ON companies.id = jobs.company_id
+            JOIN employment_types_jobs AS etj ON jobs.id = etj.job_id
+            JOIN departments_jobs AS dj ON jobs.id = dj.job_id
+            JOIN employment_types AS et ON et.id = etj.employment_type_id
+            JOIN departments ON departments.id = dj.department_id
             WHERE companies.id = %s
         """
         logger.info("Executing query: %s with company_id: %s",
@@ -197,20 +206,73 @@ class DatabasePersistence:
         
         departments = [dict(result) for result in results]
         return departments
-    
-    '''
-    TODO:
-    - figure out where/how to add fields not given values
-    to the jobs table
-    '''
-    def post_new_job(self):
-        query = """
+
+    def find_employment_type_id_by_type(self, type):
+        with self._database_connection() as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cursor:
+                cursor.execute("""
+                    SELECT id FROM employment_types
+                    WHERE type = %s
+                """, (type,))
+                result = cursor.fetchone()
+        
+        return dict(result)
+
+    def find_department_id_by_name(self, name):
+        with self._database_connection() as conn:
+            with conn.cursor(cursor_factory=DictCursor) as cursor:
+                cursor.execute("""
+                    SELECT id FROM departments
+                    WHERE name = %s
+                """, (name,))
+                result = cursor.fetchone()
+        
+        return dict(result)
+
+    def insert_new_job(self, title, location, employment_type, department,
+                       role_overview, responsibilities, requirements,
+                       nice_to_haves, benefits, pay_range, closing_date,
+                       company_id):
+        query_jobs = """
             INSERT INTO jobs (title, location, role_overview,
             responsibilities, requirements, nice_to_haves, benefits,
             pay_range, closing_date, company_id)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-
+            RETURNING id
         """
+        logger.info("""Executing query: %s, w/ title: %s, w/ location: %s,
+                    w/ role_overview: %s, w/ responsibilities: %s,
+                    w/ requirements: %s, w/ nice_to_haves: %s,
+                    w/ benefits: %s, w/ pay_range: %s, w/ closing_date: %s,
+                    w/ company_id: %s""", query_jobs, title, location,
+                    role_overview, responsibilities, requirements,
+                    nice_to_haves, benefits, pay_range, closing_date,
+                    company_id)
+        with self._database_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(query_jobs, (title, location, role_overview,
+                                       responsibilities, requirements,
+                                       nice_to_haves, benefits, pay_range,
+                                       closing_date, company_id))
+
+                job_id = cursor.fetchone()[0] # getting new job's id
+
+                employment_type_id = self.find_employment_type_id_by_type(employment_type)['id']
+                department_id = self.find_department_id_by_name(department)['id']
+
+                query_employment_types_jobs = """
+                    INSERT INTO employment_types_jobs
+                    (employment_type_id, job_id)
+                    VALUES (%s, %s)
+                """
+                cursor.execute(query_employment_types_jobs,
+                               employment_type_id, job_id)
+                query_departments_jobs = """
+                    INSERT INTO departments_jobs
+                    (department_id, job_id)
+                    VALUES (%s, %s)
+                """
+                cursor.execute(department_id, job_id)
 
     def _setup_schema(self):
         with self._database_connection() as connection:
