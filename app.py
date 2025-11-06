@@ -249,6 +249,8 @@ def post_job(company_id):
     benefits = request.form['benefits'].strip()
     pay_range = request.form['pay_range'].strip()
     closing_date = request.form['closing_date']
+    employment_type_id = request.form['employment_type']
+    department_id = request.form['department']
 
     final_benefits = benefits if benefits else None
     final_pay_range = pay_range if pay_range else None
@@ -257,7 +259,8 @@ def post_job(company_id):
     g.storage.insert_new_job(title, location, employment_type, department,
                              role_overview, responsibilities, requirements,
                              nice_to_haves, final_benefits, final_pay_range,
-                             final_closing_date, company_id)
+                             final_closing_date, company_id,
+                             employment_type_id, department_id)
     
     return redirect(url_for('view_company_profile', company_id=company_id))
 
