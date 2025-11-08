@@ -205,7 +205,7 @@ class DatabasePersistence:
         departments = [dict(result) for result in results]
         return departments
 
-    def insert_new_job(self, title, location, employment_type, department,
+    def insert_new_job(self, title, location,
                        role_overview, responsibilities, requirements,
                        nice_to_haves, benefits, pay_range, closing_date,
                        company_id, employment_type_id, department_id):

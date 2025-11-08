@@ -240,8 +240,6 @@ def view_post_job_form():
 def post_job(company_id):
     title = request.form['title'].strip()
     location = request.form['location'].strip()
-    employment_type = request.form['employment_type']
-    department = request.form['department']
     role_overview = request.form['role_overview'].strip()
     responsibilities = request.form['responsibilities'].strip()
     requirements = request.form['requirements'].strip()
@@ -249,19 +247,20 @@ def post_job(company_id):
     benefits = request.form['benefits'].strip()
     pay_range = request.form['pay_range'].strip()
     closing_date = request.form['closing_date']
-    employment_type_id = request.form['employment_type']
-    department_id = request.form['department']
+    employment_type_id = int(request.form['employment_type'])
+    department_id = int(request.form['department'])
 
     final_benefits = benefits if benefits else None
     final_pay_range = pay_range if pay_range else None
     final_closing_date = closing_date if closing_date else None
 
-    g.storage.insert_new_job(title, location, employment_type, department,
+    g.storage.insert_new_job(title, location,
                              role_overview, responsibilities, requirements,
                              nice_to_haves, final_benefits, final_pay_range,
                              final_closing_date, company_id,
                              employment_type_id, department_id)
     
+    flash(f"Successfully posted new job '{title}'.", "success")
     return redirect(url_for('view_company_profile', company_id=company_id))
 
 @app.route('/post_job/<int:company_id>/jobs/<int:job_id>', methods=['POST'])

@@ -43,9 +43,39 @@ class JobBoardTest(unittest.TestCase):
                     (title, "location", role_overview, responsibilities,
                     requirements, nice_to_haves, company_id)
                     VALUES (%s, %s, %s, %s, %s, %s, %s)
+                    RETURNING id
                 """, ('Job Title Test', 'Test, TST', 'Overview of Role',
                       'Job Responsibilities Test', 'Job Requirements Test',
                       'Nice to Haves Test', company_id))
+
+                job_id = cursor.fetchone()[0]
+
+                cursor.execute("""
+                    INSERT INTO departments (name)
+                    VALUES ('Testing Department')
+                    RETURNING id
+                """)
+
+                department_id = cursor.fetchone()[0]
+
+                cursor.execute("""
+                    INSERT INTO employment_types (type)
+                    VALUES ('Full-time')
+                    RETURNING id
+                """)
+
+                employment_type_id = cursor.fetchone()[0]
+
+                cursor.execute("""
+                    INSERT INTO departments_jobs (job_id, department_id)
+                    VALUES (%s, %s)
+                """, (job_id, department_id))
+                
+                cursor.execute("""
+                    INSERT INTO employment_types_jobs
+                        (job_id, employment_type_id)
+                    VALUES (%s, %s)
+                """, (job_id, employment_type_id))
                 
                 cursor.execute("""
                     INSERT INTO companies
@@ -309,11 +339,27 @@ class JobBoardTest(unittest.TestCase):
                       response.get_data(as_text=True))
         self.assertIn('<button type="submit">Post Job',
                       response.get_data(as_text=True))
-    
-    '''
-    TODO:
-    - test posting new job
-    '''
+
+    def test_post_new_job(self):
+        client = self.admin_session()
+        response = client.post('/post_job/1/jobs/post',
+                               data={
+                                   'title': 'New Job Test',
+                                   'location': 'New York, NY',
+                                   'employment_type': 1,
+                                   'department': 1,
+                                   'role_overview': 'testing... testing...',
+                                   'responsibilities': 'testing... testing...',
+                                   'requirements': 'testing... testing...',
+                                   'nice_to_haves': 'testing... testing...',
+                                   'benefits': '',
+                                   'pay_range': '',
+                                   'closing_date': '',
+                               }, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Successfully posted new job 'New Job Test'.",
+                      response.get_data(as_text=True))
 
     @unittest.skip
     def test_signup_missing_required(self):

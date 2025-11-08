@@ -9,7 +9,7 @@
         <input type="text" id="title" name="title" required>
 
         <label for="employment_type">Employment Type (required)</label>
-        <select id="employment_type" name="employment_type">
+        <select id="employment_type" name="employment_type" required>
             <option value="">--Please choose an option--</option>
             {% for type in employment_types %}
                 <option value="{{ type.id }}">{{ type.type }}</option>
@@ -17,7 +17,7 @@
         </select>
 
         <label for="department">Department (required)</label>
-        <select id="department" name="department">
+        <select id="department" name="department" required>
             <option value="">--Please choose an option--</option>
             {% for department in departments %}
                 <option value="{{ department.id }}">{{ department.name }}</option>
